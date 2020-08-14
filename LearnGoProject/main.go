@@ -24,7 +24,6 @@ var between time.Duration
 var sayoffTime float64 = 5
 
 func main() {
-
 	config = GetConfig()
 	client, _ := discordgo.New("Bot " + config.Token)
 	client.AddHandler(OnMessage)

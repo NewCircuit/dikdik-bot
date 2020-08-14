@@ -149,3 +149,14 @@ func OnDelete(s *discordgo.Session, msg *discordgo.MessageCreate) {
 	}
 
 }
+func OnStatus(s *discordgo.Session, msg *discordgo.MessageCreate) {
+	if _, exists := m[msg.Author.Username]; exists {
+		s.ChannelMessageSend(msg.ChannelID, "Say is currently active for "+msg.Author.Username+ " in channel <#"+m[msg.Author.Username]+">")
+		s.ChannelMessageSend(msg.ChannelID, "Thanks for checking in. I'm still a piece of garbage")
+	}else{
+		s.ChannelMessageSend(msg.ChannelID, "Say is not currently active for "+msg.Author.Username)
+		s.ChannelMessageSend(msg.ChannelID, "Thanks for checking in. I'm still a piece of garbage")
+	}
+}
+
+

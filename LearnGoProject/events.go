@@ -11,7 +11,6 @@ func OnMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
 	if msg.Author.Bot {
 		return
 	}
-	
 	//confirm prefix is correct
 	if len(msg.GuildID) == 0 {
 		return
@@ -29,7 +28,7 @@ func OnMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
 		}
 	} else {
 		//split string
-		args := strings.Split(msg.Content, " ")
+		args := strings.Split(""+msg.Content, " ")
 		//used specifically on say to clean up text
 		if len(args[:]) > 1 {
 			if args[0] == config.Prefix+"+say" {
@@ -37,7 +36,6 @@ func OnMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
 					args[2] = strings.Join(args[2:], " ")
 					//makes sure all spaces are trimmed from front and back
 					for i, arg := range args {
-
 						args[i] = strings.TrimSpace(arg)
 						//stops trimming so it doesnt remove spaces from arg[2]
 						if args[i] == args[2] {
@@ -100,6 +98,9 @@ func OnMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
 		case "delete":
 			OnDelete(s, msg)
 			break
+		case "status":
+			OnStatus(s, msg)
+			break
 		default:
 			break
 		}
@@ -107,7 +108,6 @@ func OnMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
 }
 
 func OnReady(s *discordgo.Session, ready *discordgo.Ready) {
-
 	//creates say active map
 	m = make(map[string]string)
 	//create prior message map

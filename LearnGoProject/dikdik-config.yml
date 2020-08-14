@@ -16,4 +16,6 @@ commands:
   - "Post facts in current channel"
   - "`/factsThere MentionChannel`"
   - "Send facts to the MentionedChannel"
+  - "`/status`"
+  - "Confirm if say is currently active"
   - "`/help`"
