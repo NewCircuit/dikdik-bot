@@ -28,6 +28,7 @@ func main() {
 	client, _ := discordgo.New("Bot " + config.Token)
 	client.AddHandler(OnMessage)
 	client.AddHandler(OnReady)
+	client.AddHandler(OnEdit)
 
 	if err := client.Open(); err != nil {
 		log.Fatalln("Failed to connect to Discord. Is token correct?")
