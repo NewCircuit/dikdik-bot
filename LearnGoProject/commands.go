@@ -8,14 +8,14 @@ import (
 )
 
 //help command
-func OnHelp(s *discordgo.Session, msg *discordgo.MessageCreate) {
+func onHelp(s *discordgo.Session, msg *discordgo.MessageCreate) {
 	//build string to display help/info/commands
 	embed := buildEmbed(config.CommandTitle, config.Commands)
 	s.ChannelMessageSendEmbed(msg.ChannelID, &embed)
 }
 
 //jokeThere command
-func OnJokeThere(s *discordgo.Session, msg *discordgo.MessageCreate, arg []string) {
+func onJokeThere(s *discordgo.Session, msg *discordgo.MessageCreate, arg []string) {
 	//confirm channel ID exists
 	if len(arg[:]) > 1 {
 		rand.Seed(time.Now().UnixNano())
@@ -27,7 +27,7 @@ func OnJokeThere(s *discordgo.Session, msg *discordgo.MessageCreate, arg []strin
 }
 
 //jokeHere command
-func OnJokeHere(s *discordgo.Session, msg *discordgo.MessageCreate) {
+func onJokeHere(s *discordgo.Session, msg *discordgo.MessageCreate) {
 	//creates a random seed
 	rand.Seed(time.Now().UnixNano())
 	randomIndex := rand.Intn(len(jokes))
@@ -35,7 +35,7 @@ func OnJokeHere(s *discordgo.Session, msg *discordgo.MessageCreate) {
 }
 
 //factsThere command
-func OnFactsThere(s *discordgo.Session, msg *discordgo.MessageCreate, arg []string) {
+func onFactsThere(s *discordgo.Session, msg *discordgo.MessageCreate, arg []string) {
 	//confirm channel ID exists
 	if len(arg[:]) > 1 {
 		rand.Seed(time.Now().UnixNano())
@@ -47,7 +47,7 @@ func OnFactsThere(s *discordgo.Session, msg *discordgo.MessageCreate, arg []stri
 }
 
 //factsHere command
-func OnFactsHere(s *discordgo.Session, msg *discordgo.MessageCreate) {
+func onFactsHere(s *discordgo.Session, msg *discordgo.MessageCreate) {
 	//creates a random seed
 	rand.Seed(time.Now().UnixNano())
 	randomIndex := rand.Intn(len(facts))
@@ -55,7 +55,7 @@ func OnFactsHere(s *discordgo.Session, msg *discordgo.MessageCreate) {
 }
 
 //+say command
-func OnSet(s *discordgo.Session, msg *discordgo.MessageCreate, arg []string) {
+func onSet(s *discordgo.Session, msg *discordgo.MessageCreate, arg []string) {
 	//set the channel topic
 	//turns out there is a long cool down on this so I cant use this
 	//s.ChannelEditComplex(msg.ChannelID, &discordgo.ChannelEdit{
@@ -85,7 +85,7 @@ func OnSet(s *discordgo.Session, msg *discordgo.MessageCreate, arg []string) {
 }
 
 //text while say command is active
-func OnText(s *discordgo.Session, msg *discordgo.MessageCreate) {
+func onText(s *discordgo.Session, msg *discordgo.MessageCreate) {
 
 	if _, exists := tm[msg.Author.Username]; exists {
 		//sets current time
@@ -107,7 +107,7 @@ func OnText(s *discordgo.Session, msg *discordgo.MessageCreate) {
 				}
 			} else {
 				//msg contains an attachment
-				OnAttach(s, msg.Attachments[0], msg)
+				onAttach(s, msg.Attachments[0], msg)
 			}
 		} else {
 			//if its been longer then x# of minutes delete records
@@ -124,7 +124,7 @@ func OnText(s *discordgo.Session, msg *discordgo.MessageCreate) {
 }
 
 //-say command
-func OnUnset(s *discordgo.Session, msg *discordgo.MessageCreate, arg []string) {
+func onUnset(s *discordgo.Session, msg *discordgo.MessageCreate, arg []string) {
 	//clear the channel topic
 	//turns out there is a long cool down on this so I cant use this
 	//s.ChannelEditComplex(msg.ChannelID, &discordgo.ChannelEdit{
@@ -145,7 +145,7 @@ func OnUnset(s *discordgo.Session, msg *discordgo.MessageCreate, arg []string) {
 }
 
 //deletes message last posted in channel
-func OnDelete(s *discordgo.Session, msg *discordgo.MessageCreate) {
+func onDelete(s *discordgo.Session, msg *discordgo.MessageCreate) {
 	//checks if user exists- last message contains a value
 	if _, exists := dm[m[msg.Author.Username]]; exists {
 		s.ChannelMessageDelete(m[msg.Author.Username], dm[m[msg.Author.Username]])
@@ -157,7 +157,7 @@ func OnDelete(s *discordgo.Session, msg *discordgo.MessageCreate) {
 }
 
 //checks if say is active
-func OnStatus(s *discordgo.Session, msg *discordgo.MessageCreate) {
+func onStatus(s *discordgo.Session, msg *discordgo.MessageCreate) {
 	//if user exists in map say active
 	if _, exists := m[msg.Author.Username]; exists {
 		s.ChannelMessageSend(msg.ChannelID, "Say is currently active for "+msg.Author.Username+" in channel <#"+m[msg.Author.Username]+">")
@@ -169,7 +169,7 @@ func OnStatus(s *discordgo.Session, msg *discordgo.MessageCreate) {
 	}
 }
 
-func OnEdit(s *discordgo.Session, editmsg *discordgo.MessageUpdate) {
+func onEdit(s *discordgo.Session, editmsg *discordgo.MessageUpdate) {
 
 	if _, exists := m[editmsg.Author.Username]; exists {
 		if editmsg.EditedTimestamp != ""{
@@ -183,7 +183,7 @@ func OnEdit(s *discordgo.Session, editmsg *discordgo.MessageUpdate) {
 	}
 }
 
-func OnAttach(s *discordgo.Session, attmsg *discordgo.MessageAttachment, msg *discordgo.MessageCreate) {
+func onAttach(s *discordgo.Session, attmsg *discordgo.MessageAttachment, msg *discordgo.MessageCreate) {
 	//checks to see if attachment message contains text/a title
 	if msg.Content != "" {
 		//posts message content and url to other channel

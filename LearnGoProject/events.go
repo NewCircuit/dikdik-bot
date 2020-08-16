@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func OnMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
+func onMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
 	if msg.Author.Bot {
 		return
 	}
@@ -19,7 +19,7 @@ func OnMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
 		if msg.ChannelID == cm[msg.Author.Username] {
 			//confirms say is active for user and posts all messages to other channel
 			if _, exists := m[msg.Author.Username]; exists {
-				OnText(s, msg)
+				onText(s, msg)
 			} else {
 				return
 			}
@@ -76,30 +76,30 @@ func OnMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
 		args[0] = strings.ToLower(args[0])
 		switch args[0] {
 		case "+say":
-			OnSet(s, msg, args[:])
+			onSet(s, msg, args[:])
 			break
 		case "-say":
-			OnUnset(s, msg, args[:])
+			onUnset(s, msg, args[:])
 		case "jokethere":
-			OnJokeThere(s, msg, args[:])
+			onJokeThere(s, msg, args[:])
 			break
 		case "factsthere":
-			OnFactsThere(s, msg, args[:])
+			onFactsThere(s, msg, args[:])
 			break
 		case "factshere":
-			OnFactsHere(s, msg)
+			onFactsHere(s, msg)
 			break
 		case "jokehere":
-			OnJokeHere(s, msg)
+			onJokeHere(s, msg)
 			break
 		case "help":
-			OnHelp(s, msg)
+			onHelp(s, msg)
 			break
 		case "delete":
-			OnDelete(s, msg)
+			onDelete(s, msg)
 			break
 		case "status":
-			OnStatus(s, msg)
+			onStatus(s, msg)
 			break
 		default:
 			break
@@ -107,7 +107,7 @@ func OnMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
 	}
 }
 
-func OnReady(s *discordgo.Session, ready *discordgo.Ready) {
+func onReady(s *discordgo.Session, ready *discordgo.Ready) {
 	//creates say active map
 	m = make(map[string]string)
 	//create prior message map
