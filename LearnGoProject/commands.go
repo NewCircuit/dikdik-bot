@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"math/rand"
 	"strconv"
@@ -89,35 +88,35 @@ func OnSet(s *discordgo.Session, msg *discordgo.MessageCreate, arg []string) {
 func OnText(s *discordgo.Session, msg *discordgo.MessageCreate) {
 
 	if _, exists := tm[msg.Author.Username]; exists {
-		//check if there is an attachment
-		if len(msg.Attachments) == 0 {
-			//check if message contains content
-			if msg.Content != "" {
-				//sets current time
-				currentTime := time.Now()
-				//sets old time based on info in map
-				oldtime := tm[msg.Author.Username]
-				//finds the difference between the two times
-				diff := currentTime.Sub(oldtime)
-				//confirms it hasnt been more then x# of minutes since last message
-				if diff.Minutes() < sayoffTime {
+		//sets current time
+		currentTime := time.Now()
+		//sets old time based on info in map
+		oldtime := tm[msg.Author.Username]
+		//finds the difference between the two times
+		diff := currentTime.Sub(oldtime)
+		//confirms it hasnt been more then x# of minutes since last message
+		if diff.Minutes() < sayoffTime {
+			//check if there is an attachment
+			if len(msg.Attachments) == 0 {
+				//check if message contains content
+				if msg.Content != "" {
 					//posts all messages to other channels
 					message, _ := s.ChannelMessageSend(m[msg.Author.Username], msg.Content)
 					//record message id that was posted to other channel
 					dm[m[msg.Author.Username]] = message.ID
-				} else {
-					//if its been longer then x# of minutes delete records
-					s.ChannelMessageSend(msg.ChannelID, " Say automatically turned off for user "+msg.Author.Username+" after "+strconv.FormatFloat(sayoffTime, 'f', 0, 64)+" minutes")
-					delete(dm, m[msg.Author.Username])
-					delete(m, msg.Author.Username)
-					delete(tm, msg.Author.Username)
-					delete(cm, msg.Author.Username)
-					return
 				}
+			} else {
+				//msg contains an attachment
+				OnAttach(s, msg.Attachments[0], msg)
 			}
-		}else{
-			//msg contains an attachment
-			s.ChannelMessageSend(msg.ChannelID, "Attachments are not supported! Please send in link format")
+		} else {
+			//if its been longer then x# of minutes delete records
+			s.ChannelMessageSend(msg.ChannelID, " Say automatically turned off for user "+msg.Author.Username+" after "+strconv.FormatFloat(sayoffTime, 'f', 0, 64)+" minutes")
+			delete(dm, m[msg.Author.Username])
+			delete(m, msg.Author.Username)
+			delete(tm, msg.Author.Username)
+			delete(cm, msg.Author.Username)
+			return
 		}
 	} else {
 		return
@@ -147,7 +146,7 @@ func OnUnset(s *discordgo.Session, msg *discordgo.MessageCreate, arg []string) {
 
 //deletes message last posted in channel
 func OnDelete(s *discordgo.Session, msg *discordgo.MessageCreate) {
-
+	//checks if user exists- last message contains a value
 	if _, exists := dm[m[msg.Author.Username]]; exists {
 		s.ChannelMessageDelete(m[msg.Author.Username], dm[m[msg.Author.Username]])
 		s.ChannelMessageSend(msg.ChannelID, "The message has been deleted")
@@ -155,34 +154,45 @@ func OnDelete(s *discordgo.Session, msg *discordgo.MessageCreate) {
 		//if user doesnt exist return
 		s.ChannelMessageSend(msg.ChannelID, "There is no prior message available to be deleted")
 	}
-
 }
 
 //checks if say is active
 func OnStatus(s *discordgo.Session, msg *discordgo.MessageCreate) {
+	//if user exists in map say active
 	if _, exists := m[msg.Author.Username]; exists {
 		s.ChannelMessageSend(msg.ChannelID, "Say is currently active for "+msg.Author.Username+" in channel <#"+m[msg.Author.Username]+">")
 		s.ChannelMessageSend(msg.ChannelID, "Thanks for checking in. I'm still a piece of garbage")
 	} else {
+		//user doesnt exist in map- not active
 		s.ChannelMessageSend(msg.ChannelID, "Say is not currently active for "+msg.Author.Username)
 		s.ChannelMessageSend(msg.ChannelID, "Thanks for checking in. I'm still a piece of garbage")
 	}
 }
 
-func OnEdit(s *discordgo.Session, editmsg *discordgo.MessageUpdate){
-	fmt.Println("channel id" +editmsg.ChannelID+ " message id" + editmsg.ID)
-	oldmsg, err := s.State.Message(editmsg.ChannelID,editmsg.ID)
-	fmt.Println(oldmsg)
-	if err != nil{
-		return
+func OnEdit(s *discordgo.Session, editmsg *discordgo.MessageUpdate) {
+
+	if _, exists := m[editmsg.Author.Username]; exists {
+		if editmsg.EditedTimestamp != ""{
+			//edit message in other channel
+			s.ChannelMessageEdit(m[editmsg.Author.Username], dm[m[editmsg.Author.Username]], editmsg.Content)
+			//set timestamp to last message sent
+			tm[editmsg.Author.Username] = time.Now()
+			//confirms message has been edited in other channel
+			s.ChannelMessageSend(editmsg.Author.Username, "The message has been edited")
+		}
 	}
-	if _, exists := m[oldmsg.Author.Username]; exists {
-		//edit message in other channel
-		fmt.Println( "channel id: " +cm[oldmsg.Author.Username]+ " Message ID: " +m[oldmsg.Author.Username] )
-		s.ChannelMessageEdit(cm[oldmsg.Author.Username],m[oldmsg.Author.Username], editmsg.Content)
-		//set timestamp to last message sent
-		tm[oldmsg.Author.Username] = time.Now()
-		//confirms message has been edited in other channel
-		s.ChannelMessageSend(oldmsg.Author.Username, "The message has been edited")
+}
+
+func OnAttach(s *discordgo.Session, attmsg *discordgo.MessageAttachment, msg *discordgo.MessageCreate) {
+	//checks to see if attachment message contains text/a title
+	if msg.Content != "" {
+		//posts message content and url to other channel
+		message, _ := s.ChannelMessageSend(m[msg.Author.Username], msg.Content+" "+attmsg.URL)
+		//record message id that was posted to other channel
+		dm[m[msg.Author.Username]] = message.ID
+	} else {
+		//message doesnt contain content
+		message, _ := s.ChannelMessageSend(m[msg.Author.Username], attmsg.URL)
+		dm[m[msg.Author.Username]] = message.ID
 	}
 }

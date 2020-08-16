@@ -16,7 +16,7 @@ func OnMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
 		return
 	} else if !strings.HasPrefix(msg.Content, config.Prefix) && !strings.HasPrefix(msg.Content, "`"+config.Prefix) && !strings.HasPrefix(msg.Content, "``"+config.Prefix) {
 		//confirms user is commenting in the correct channel
-		if msg.ChannelID == cm[msg.Author.Username]{
+		if msg.ChannelID == cm[msg.Author.Username] {
 			//confirms say is active for user and posts all messages to other channel
 			if _, exists := m[msg.Author.Username]; exists {
 				OnText(s, msg)
