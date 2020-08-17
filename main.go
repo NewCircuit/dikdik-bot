@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	util "github.com/Floor-Gang/utilpkg"
 	"github.com/bwmarrin/discordgo"
+	"io/ioutil"
 	"log"
 	"strings"
 	"time"
@@ -22,14 +24,24 @@ var bool = false
 var between time.Duration
 //time until timeout and deactivate say automatically
 var sayoffTime float64 = 5
+//create joke array
+var jokelist []string
+//create fact array
+var factlist []string
 
 func main() {
+	//set config
 	config = GetConfig()
+	//loads files
+	//jokelist = readFile(config.CSVPathJokes)
+	//factlist = readFile(config.CSVPathFacts)
+	fmt.Println(config.Token)
+	//initialize handlers and  client
 	client, _ := discordgo.New("Bot " + config.Token)
-	client.AddHandler(OnMessage)
-	client.AddHandler(OnReady)
-	client.AddHandler(OnEdit)
-
+	client.AddHandler(onMessage)
+	client.AddHandler(onReady)
+	client.AddHandler(onEdit)
+	//confirm client opened properly
 	if err := client.Open(); err != nil {
 		log.Fatalln("Failed to connect to Discord. Is token correct?")
 	}
@@ -56,4 +68,19 @@ func buildEmbed(s string, cmd []string) discordgo.MessageEmbed {
 		return embed
 
 	}
+}
+
+func readFile(filename string)[]string{
+	//read file
+	file, err := ioutil.ReadFile(filename)
+	//check for errors
+	if err != nil {
+		log.Fatalf("failed opening file: %s", err)
+	}
+	//create string to hold file contents
+	var str = string(file)
+	//split string on comma
+	var txtlines = strings.Split(str,",")
+	//return array
+	return txtlines[:]
 }
