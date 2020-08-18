@@ -1,4 +1,4 @@
-package internal
+package main
 
 import (
 	"fmt"
@@ -7,21 +7,19 @@ import (
 	"time"
 )
 
-func (bot *Bot) onMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
+func onMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
 	if msg.Author.Bot {
 		return
 	}
 	//confirm prefix is correct
 	if len(msg.GuildID) == 0 {
 		return
-	} else if !strings.HasPrefix(msg.Content, bot.config.Prefix) &&
-		!strings.HasPrefix(msg.Content, "`"+bot.config.Prefix) &&
-		!strings.HasPrefix(msg.Content, "``"+bot.config.Prefix) {
+	} else if !strings.HasPrefix(msg.Content, config.Prefix) && !strings.HasPrefix(msg.Content, "`"+config.Prefix) && !strings.HasPrefix(msg.Content, "``"+config.Prefix) {
 		//confirms user is commenting in the correct channel
-		if msg.ChannelID == bot.allVars.cm[msg.Author.Username] {
+		if msg.ChannelID == cm[msg.Author.Username] {
 			//confirms say is active for user and posts all messages to other channel
-			if _, exists := bot.allVars.m[msg.Author.Username]; exists {
-				bot.onText(s, msg)
+			if _, exists := m[msg.Author.Username]; exists {
+				onText(s, msg)
 			} else {
 				return
 			}
@@ -33,7 +31,7 @@ func (bot *Bot) onMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
 		args := strings.Split(""+msg.Content, " ")
 		//used specifically on say to clean up text
 		if len(args[:]) > 1 {
-			if args[0] == bot.config.Prefix+"+say" {
+			if args[0] == config.Prefix+"+say" {
 				if len(args[:]) > 2 {
 					args[2] = strings.Join(args[2:], " ")
 					//makes sure all spaces are trimmed from front and back
@@ -78,30 +76,30 @@ func (bot *Bot) onMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
 		args[0] = strings.ToLower(args[0])
 		switch args[0] {
 		case "+say":
-			bot.onSet(s, msg, args[:])
+			onSet(s, msg, args[:])
 			break
 		case "-say":
-			bot.onUnset(s, msg, args[:])
+			onUnset(s, msg, args[:])
 		case "jokethere":
-			bot.onJokeThere(s, msg, args[:])
+			onJokeThere(s, msg, args[:])
 			break
 		case "factsthere":
-			bot.onFactsThere(s, msg, args[:])
+			onFactsThere(s, msg, args[:])
 			break
 		case "factshere":
-			bot.onFactsHere(s, msg)
+			onFactsHere(s, msg)
 			break
 		case "jokehere":
-			bot.onJokeHere(s, msg)
+			onJokeHere(s, msg)
 			break
 		case "help":
-			bot.onHelp(s, msg)
+			onHelp(s, msg)
 			break
 		case "delete":
-			bot.onDelete(s, msg)
+			onDelete(s, msg)
 			break
 		case "status":
-			bot.onStatus(s, msg)
+			onStatus(s, msg)
 			break
 		default:
 			break
@@ -109,31 +107,17 @@ func (bot *Bot) onMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
 	}
 }
 
-func (bot *Bot) onReady(s *discordgo.Session, ready *discordgo.Ready) {
+func onReady(s *discordgo.Session, ready *discordgo.Ready) {
 	//creates say active map
-	bot.allVars.m = make(map[string]string)
+	m = make(map[string]string)
 	//create prior message map
-	bot.allVars.dm = make(map[string]string)
+	dm = make(map[string]string)
 	//create current channel map
-	bot.allVars.cm = make(map[string]string)
+	cm = make(map[string]string)
 	//create timestamp
-	bot.allVars.tm = make(map[string]time.Time)
+	tm = make(map[string]time.Time)
 
 	//confirms bot is ready
 	testing := fmt.Sprintf("ready your %s\n", ready.User.Username)
 	fmt.Printf(testing)
-}
-
-
-func (bot Bot) onEdit(s *discordgo.Session, editmsg *discordgo.MessageUpdate) {
-	if _, exists := bot.allVars.m[editmsg.Author.Username]; exists {
-		if editmsg.EditedTimestamp != ""{
-			//edit message in other channel
-			s.ChannelMessageEdit(bot.allVars.m[editmsg.Author.Username], bot.allVars.dm[bot.allVars.m[editmsg.Author.Username]], editmsg.Content)
-			//set timestamp to last message sent
-			bot.allVars.tm[editmsg.Author.Username] = time.Now()
-			//confirms message has been edited in other channel
-			s.ChannelMessageSend(editmsg.Author.Username, "The message has been edited")
-		}
-	}
 }
