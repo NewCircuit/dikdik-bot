@@ -7,11 +7,7 @@ import (
 	"time"
 )
 
-<<<<<<< HEAD:DikDik-Bot/internal/events.go
 func (bot *Bot) onMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
-=======
-func onMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
->>>>>>> f6a4cb7de86884636393f079d2b7e912d4f92231:events.go
 	if msg.Author.Bot {
 		return
 	}
@@ -24,16 +20,11 @@ func onMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
 		//confirms user is commenting in the correct channel
 		if msg.ChannelID == bot.allVars.cm[msg.Author.Username] {
 			//confirms say is active for user and posts all messages to other channel
-<<<<<<< HEAD:DikDik-Bot/internal/events.go
 			if err, exists := bot.allVars.m[msg.Author.Username]; exists {
 				if err != "" {
 					fmt.Println(err)
 				}
 				bot.onText(s, msg)
-=======
-			if _, exists := m[msg.Author.Username]; exists {
-				onText(s, msg)
->>>>>>> f6a4cb7de86884636393f079d2b7e912d4f92231:events.go
 			} else {
 				return
 			}
@@ -96,7 +87,6 @@ func onMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
 		args[0] = strings.ToLower(args[0])
 		switch args[0] {
 		case "+say":
-<<<<<<< HEAD:DikDik-Bot/internal/events.go
 			bot.onSet(s, msg, args[:])
 			break
 		case "-say":
@@ -121,32 +111,6 @@ func onMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
 			break
 		case "status":
 			bot.onStatus(s, msg)
-=======
-			onSet(s, msg, args[:])
-			break
-		case "-say":
-			onUnset(s, msg, args[:])
-		case "jokethere":
-			onJokeThere(s, msg, args[:])
-			break
-		case "factsthere":
-			onFactsThere(s, msg, args[:])
-			break
-		case "factshere":
-			onFactsHere(s, msg)
-			break
-		case "jokehere":
-			onJokeHere(s, msg)
-			break
-		case "help":
-			onHelp(s, msg)
-			break
-		case "delete":
-			onDelete(s, msg)
-			break
-		case "status":
-			onStatus(s, msg)
->>>>>>> f6a4cb7de86884636393f079d2b7e912d4f92231:events.go
 			break
 		default:
 			break
@@ -154,7 +118,6 @@ func onMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
 	}
 }
 
-<<<<<<< HEAD:DikDik-Bot/internal/events.go
 func (bot Bot) onEdit(s *discordgo.Session, editmsg *discordgo.MessageUpdate) {
 	if editmsg.EditedTimestamp != "" {
 		if _, exists := bot.allVars.m[editmsg.Author.Username]; exists {
@@ -164,17 +127,6 @@ func (bot Bot) onEdit(s *discordgo.Session, editmsg *discordgo.MessageUpdate) {
 			if err != nil {
 				fmt.Println(err)
 			}
-=======
-func onReady(s *discordgo.Session, ready *discordgo.Ready) {
-	//creates say active map
-	m = make(map[string]string)
-	//create prior message map
-	dm = make(map[string]string)
-	//create current channel map
-	cm = make(map[string]string)
-	//create timestamp
-	tm = make(map[string]time.Time)
->>>>>>> f6a4cb7de86884636393f079d2b7e912d4f92231:events.go
 
 			//set timestamp to last message sent
 			bot.allVars.tm[editmsg.Author.Username] = time.Now()
