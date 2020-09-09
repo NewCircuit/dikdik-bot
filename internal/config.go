@@ -6,10 +6,10 @@ import (
 )
 
 type DikDikConfig struct {
-	Token        string   `yaml:"bot_token"`
-	Prefix       string   `yaml:"bot_prefix"`
-	CSVPathJokes string   `yaml:"csv_path_jokes"`
-	CSVPathFacts string   `yaml:"csv_path_facts"`
+	Token        string `yaml:"bot_token"`
+	Prefix       string `yaml:"bot_prefix"`
+	CSVPathJokes string `yaml:"csv_path_jokes"`
+	CSVPathFacts string `yaml:"csv_path_facts"`
 }
 
 const ConfigPath = "dikdik-config.yml"

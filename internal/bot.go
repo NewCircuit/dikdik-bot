@@ -91,23 +91,23 @@ func (bot Bot) buildEmbed() discordgo.MessageEmbed {
 		embed.Color = 0x1385ef
 		embed.Title = "Commands"
 		//only join when first creating
-		embed.Description =  "`/+say channelName [message to send to channel]`\n"+
-		 "Activate message sending to MentionedChannel. All messages you send hereafter will be send to this channel\n"+
-		 "`/-say`\n"+
-		 "Deactivate message sending to MentionChannel\n"+
-		 "`/delete`\n"+
-		 "Delete last sent message while say is active\n"+
-		 "`/jokeHere`\n"+
-		 "Post a joke in current channel\n"+
-		 "`/jokeThere MentionChannel`\n"+
-		 "Send joke to the MentionedChannel\n"+
-		 "`/factsHere`\n"+
-		 "Post facts in current channel\n"+
-		 "`/factsThere MentionChannel`\n"+
-		 "Send facts to the MentionedChannel\n"+
-		 "`/status`\n"+
-		 "Confirm if say is currently active\n"+
-		 "`/help`"
+		embed.Description = "`/+say channelName [message to send to channel]`\n" +
+			"Activate message sending to MentionedChannel. All messages you send hereafter will be send to this channel\n" +
+			"`/-say`\n" +
+			"Deactivate message sending to MentionChannel\n" +
+			"`/delete`\n" +
+			"Delete last sent message while say is active\n" +
+			"`/jokeHere`\n" +
+			"Post a joke in current channel\n" +
+			"`/jokeThere MentionChannel`\n" +
+			"Send joke to the MentionedChannel\n" +
+			"`/factsHere`\n" +
+			"Post facts in current channel\n" +
+			"`/factsThere MentionChannel`\n" +
+			"Send facts to the MentionedChannel\n" +
+			"`/status`\n" +
+			"Confirm if say is currently active\n" +
+			"`/help`"
 		bot.allVars.ourBool = true
 		return embed
 	}

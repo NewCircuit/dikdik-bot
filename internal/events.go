@@ -64,8 +64,7 @@ func (bot *Bot) onMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
 						}
 						return
 					}
-				} else
-				{
+				} else {
 					_, err := s.State.Channel(args[1])
 					if err != nil {
 						fmt.Println(args[1], err)
