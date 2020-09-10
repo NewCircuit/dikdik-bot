@@ -11,14 +11,20 @@ import (
 
 // Variables used for command line parameters
 type Bot struct {
-	config    DikDikConfig
-	botPrefix string
-	client    *dg.Session
-	allVars   Variables1
-	//create joke array
-	jokes []string
-	//create fact array
-	facts []string
+	config   DikDikConfig
+	client   *dg.Session
+	jokes    []string
+	facts    []string
+	allVars  Variables1
+	channels map[string]ChannelMap
+}
+
+// ChannelMap is when two channels are bridged message from a user in the "from" channel get sent
+// to the "to" channel.
+type ChannelMap struct {
+	from string
+	to   string
+	user string
 }
 
 type Variables1 struct {
@@ -50,10 +56,10 @@ func Start(config DikDikConfig) {
 
 	//create bot
 	bot := Bot{
-		config:    config,
-		botPrefix: config.Prefix,
-		client:    client,
-		allVars:   varbs,
+		config:   config,
+		client:   client,
+		allVars:  varbs,
+		channels: make(map[string]ChannelMap),
 	}
 
 	//loads files
@@ -111,6 +117,10 @@ func (bot Bot) buildEmbed() dg.MessageEmbed {
 		return embed
 	}
 	return embed
+}
+
+func (Bot) sendMsg(msg *dg.MessageCreate) {
+
 }
 
 func readFile(filename string) []string {
