@@ -9,8 +9,8 @@ import (
 type DikDikConfig struct {
 	Token        string `yaml:"bot_token"`
 	Prefix       string `yaml:"bot_prefix"`
-	CSVPathJokes string `yaml:"csv_path_jokes"`
-	CSVPathFacts string `yaml:"csv_path_facts"`
+	CSVPathJokes string `yaml:"jokes_path"`
+	CSVPathFacts string `yaml:"facts_path"`
 }
 
 const defaultPath = "dikdik-config.yml"
