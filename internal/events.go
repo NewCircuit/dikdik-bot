@@ -20,6 +20,12 @@ func (bot *Bot) onMessage(s *dg.Session, msg *dg.MessageCreate) {
 		return
 	}
 
+	hasPerms, _ := bot.auth.Verify(msg.Author.ID)
+
+	if !hasPerms {
+		return
+	}
+
 	body := strings.ToLower(msg.Content[len(bot.config.Prefix):])
 	args := strings.Split(body, " ")
 

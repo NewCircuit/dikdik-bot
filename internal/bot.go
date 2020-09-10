@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	auth "github.com/Floor-Gang/authclient"
 	dg "github.com/bwmarrin/discordgo"
 	"io/ioutil"
 	"log"
@@ -10,6 +11,7 @@ import (
 
 // Variables used for command line parameters
 type Bot struct {
+	auth     *auth.AuthClient
 	config   *DikDikConfig
 	client   *dg.Session
 	help     *dg.MessageEmbed
@@ -31,11 +33,17 @@ func Start(config *DikDikConfig) {
 
 	//initialize client
 	client, _ := dg.New("Bot " + config.Token)
+	authClient, err := auth.GetClient(config.AuthServer)
+
+	if err != nil {
+		log.Fatalln("Failed to connect to authserver")
+	}
 
 	client.State.MaxMessageCount = 1000
 
 	//create bot
 	bot := Bot{
+		auth:     &authClient,
 		config:   config,
 		client:   client,
 		channels: make(map[string]*ChannelMap),
