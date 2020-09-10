@@ -1,10 +1,8 @@
 package internal
 
 import (
-	"fmt"
 	dg "github.com/bwmarrin/discordgo"
 	"strings"
-	"time"
 )
 
 func (bot *Bot) onMessage(s *dg.Session, msg *dg.MessageCreate) {
@@ -13,15 +11,15 @@ func (bot *Bot) onMessage(s *dg.Session, msg *dg.MessageCreate) {
 	}
 	//confirm prefix is correct
 	if !strings.HasPrefix(msg.Content, bot.config.Prefix) {
-		//confirms user is commenting in the correct channel
+		channelMap, isOK := bot.channels[msg.Author.ID]
+
+		if isOK && channelMap.from == msg.ChannelID {
+			bot.onText(msg, channelMap)
+		}
+
 		if msg.ChannelID == bot.allVars.cm[msg.Author.Username] {
 			//confirms say is active for user and posts all messages to other channel
-			if err, exists := bot.allVars.m[msg.Author.Username]; exists {
-				if err != "" {
-					fmt.Println(err)
-				}
-				bot.onText(s, msg)
-			}
+
 		}
 		return
 	}
@@ -31,10 +29,10 @@ func (bot *Bot) onMessage(s *dg.Session, msg *dg.MessageCreate) {
 	args := strings.Split(body, " ")
 
 	switch args[0] {
-	case "+say":
-		bot.onSet(s, msg, args)
+	case "talk":
+		bot.onSet(s, msg, args[1:])
 		break
-	case "-say":
+	case "stop":
 		bot.onUnset(s, msg, args)
 	case "joke":
 		bot.onJoke(s, msg, args)
@@ -59,28 +57,38 @@ func (bot *Bot) onMessage(s *dg.Session, msg *dg.MessageCreate) {
 	}
 }
 
-func (bot Bot) onEdit(s *dg.Session, editmsg *dg.MessageUpdate) {
-	if editmsg.EditedTimestamp != "" {
-		if _, exists := bot.allVars.m[editmsg.Author.Username]; exists {
+func (bot Bot) onEdit(s *dg.Session, msg *dg.MessageUpdate) {
+	channelMap, isOK := bot.channels[msg.Author.ID]
 
-			//edit message in other channel
-			_, err := s.ChannelMessageEdit(
-				bot.allVars.m[editmsg.Author.Username],
-				bot.allVars.dm[bot.allVars.m[editmsg.Author.Username]],
-				editmsg.Content,
-			)
-			if err != nil {
-				fmt.Println(err)
-			}
+	if isOK {
+		editing, isOK := channelMap.messages[msg.ID]
 
-			//set timestamp to last message sent
-			bot.allVars.tm[editmsg.Author.Username] = time.Now()
-			//confirms message has been edited in other channel
-			_, errd := s.ChannelMessageSend(editmsg.Author.Username, "The message has been edited")
-			if errd != nil {
-				fmt.Println(errd)
-			}
-
+		if !isOK {
+			return
 		}
+		s.ChannelMessageEdit(channelMap.to, editing, msg.Content)
 	}
+	// if editmsg.EditedTimestamp != "" {
+	// 	if _, exists := bot.allVars.m[editmsg.Author.Username]; exists {
+
+	// 		//edit message in other channel
+	// 		_, err := s.ChannelMessageEdit(
+	// 			bot.allVars.m[editmsg.Author.Username],
+	// 			bot.allVars.dm[bot.allVars.m[editmsg.Author.Username]],
+	// 			editmsg.Content,
+	// 		)
+	// 		if err != nil {
+	// 			fmt.Println(err)
+	// 		}
+
+	// 		//set timestamp to last message sent
+	// 		bot.allVars.tm[editmsg.Author.Username] = time.Now()
+	// 		//confirms message has been edited in other channel
+	// 		_, errd := s.ChannelMessageSend(editmsg.Author.Username, "The message has been edited")
+	// 		if errd != nil {
+	// 			fmt.Println(errd)
+	// 		}
+
+	// 	}
+	// }
 }

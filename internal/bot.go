@@ -16,15 +16,16 @@ type Bot struct {
 	jokes    []string
 	facts    []string
 	allVars  Variables1
-	channels map[string]ChannelMap
+	channels map[string]*ChannelMap
 }
 
 // ChannelMap is when two channels are bridged message from a user in the "from" channel get sent
 // to the "to" channel.
 type ChannelMap struct {
-	from string
-	to   string
-	user string
+	from     string
+	to       string
+	user     string
+	messages map[string]string
 }
 
 type Variables1 struct {
@@ -59,7 +60,7 @@ func Start(config DikDikConfig) {
 		config:   config,
 		client:   client,
 		allVars:  varbs,
-		channels: make(map[string]ChannelMap),
+		channels: make(map[string]*ChannelMap),
 	}
 
 	//loads files
@@ -96,9 +97,9 @@ func (bot Bot) buildEmbed() dg.MessageEmbed {
 		embed.Title = "Commands"
 		//only join when first creating
 		embed.Description = strings.Replace(
-			"`{prefix}+say channelName [message to send to channel]`\n"+
+			"`{prefix}talk channelName [message to send to channel]`\n"+
 				"Activate message sending to MentionedChannel. All messages you send hereafter will be send to this channel\n"+
-				"`{prefix}-say`\n"+
+				"`{prefix}stop`\n"+
 				"Deactivate message sending to MentionChannel\n"+
 				"`{prefix}delete`\n"+
 				"Delete last sent message while say is active\n"+
@@ -117,10 +118,6 @@ func (bot Bot) buildEmbed() dg.MessageEmbed {
 		return embed
 	}
 	return embed
-}
-
-func (Bot) sendMsg(msg *dg.MessageCreate) {
-
 }
 
 func readFile(filename string) []string {

@@ -5,7 +5,6 @@ import (
 	util "github.com/Floor-Gang/utilpkg/botutil"
 	dg "github.com/bwmarrin/discordgo"
 	"math/rand"
-	"strconv"
 	"time"
 )
 
@@ -69,99 +68,50 @@ func (bot Bot) onFactsHere(s *dg.Session, msg *dg.MessageCreate) {
 }
 
 //+say command
-func (bot Bot) onSet(s *dg.Session, msg *dg.MessageCreate, arg []string) {
-	//confirms there is a channel in the message
-	if len(arg[:]) > 1 {
-		//create map record of author and channel id where message is sent
-		bot.allVars.m[msg.Author.Username] = arg[1]
-		//create map record of author and channel id where message is from
-		bot.allVars.cm[msg.Author.Username] = msg.ChannelID
-		//set timestamp to last message sent
-		bot.allVars.tm[msg.Author.Username] = time.Now()
-		//confirm there is something to post after setting the say
-		if len(arg[:]) > 2 {
-			//post in other channel
-			message, err := s.ChannelMessageSend(arg[1], arg[2])
-			if err != nil {
-				fmt.Println(err)
-			}
-			//record message id that was posted to other channel
-			bot.allVars.dm[bot.allVars.m[msg.Author.Username]] = message.ID
-			_, err = s.ChannelMessageSend(
-				msg.ChannelID,
-				"You are now sending messages to <#"+arg[1]+">",
-			)
-			if err != nil {
-				fmt.Println(err)
-			}
+func (bot Bot) onSet(s *dg.Session, msg *dg.MessageCreate, args []string) {
+	if len(args) > 0 {
+		channelID := util.FilterTag(args[0])
+		channel, err := bot.client.Channel(channelID)
 
-		} else {
-			_, err := s.ChannelMessageSend(
-				msg.ChannelID,
-				"You are currently sending messages to <#"+bot.allVars.m[msg.Author.Username]+">",
-			)
-			if err != nil {
-				fmt.Println(err)
-			}
-
+		if err != nil {
+			util.Reply(bot.client, msg.Message, "Couldn't find "+args[0])
+			return
 		}
+
+		channelMap := &ChannelMap{
+			from:     msg.ChannelID,
+			to:       channelID,
+			user:     msg.Author.ID,
+			messages: make(map[string]string),
+		}
+
+		bot.channels[channelMap.user] = channelMap
+
+		util.Reply(bot.client, msg.Message, "Now talking in "+channel.Mention())
+
 	} else {
 		_, err := s.ChannelMessageSend(msg.ChannelID, "Invalid Channel. Use /help to see commands")
 		if err != nil {
 			fmt.Println(err)
 		}
-
 	}
 }
 
 //text while say command is active
-func (bot Bot) onText(s *dg.Session, msg *dg.MessageCreate) {
+func (bot Bot) onText(msg *dg.MessageCreate, channelMap *ChannelMap) {
+	_, err := bot.client.Channel(channelMap.to)
 
-	if _, exists := bot.allVars.tm[msg.Author.Username]; exists {
-		//sets current time
-		currentTime := time.Now()
-		//sets old time based on info in map
-		oldtime := bot.allVars.tm[msg.Author.Username]
-		//finds the difference between the two times
-		diff := currentTime.Sub(oldtime)
-		//confirms it hasnt been more then x# of minutes since last message
-		if diff.Minutes() < bot.allVars.sayoffTime {
-			//check if there is an attachment
-			if len(msg.Attachments) == 0 {
-				//check if message contains content
-				if msg.Content != "" {
-					//posts all messages to other channels
-					message, err := s.ChannelMessageSend(
-						bot.allVars.m[msg.Author.Username],
-						msg.Content,
-					)
-					if err != nil {
-						fmt.Println(err)
-					}
-					//record message id that was posted to other channel
-					bot.allVars.dm[bot.allVars.m[msg.Author.Username]] = message.ID
-				}
-			} else {
-				//msg contains an attachment
-				bot.onAttach(s, msg.Attachments[0], msg)
-			}
-		} else {
-			//if its been longer then x# of minutes delete records
-			_, err := s.ChannelMessageSend(msg.ChannelID,
-				" Say automatically turned off for user "+msg.Author.Username+" after "+
-					strconv.FormatFloat(bot.allVars.sayoffTime, 'f', 0, 64)+" minutes")
-			if err != nil {
-				fmt.Println(err)
-			}
-
-			delete(bot.allVars.dm, bot.allVars.m[msg.Author.Username])
-			delete(bot.allVars.m, msg.Author.Username)
-			delete(bot.allVars.tm, msg.Author.Username)
-			delete(bot.allVars.cm, msg.Author.Username)
-			return
-		}
-	} else {
+	if err != nil {
+		delete(bot.channels, msg.Author.ID)
 		return
+	}
+
+	msgSent, err := bot.client.ChannelMessageSend(channelMap.to, msg.Content)
+
+	if err == nil {
+		channelMap.messages[msg.ID] = msgSent.ID
+	} else {
+		_, _ = util.Reply(bot.client, msg.Message, "Failed to send message. Do I have permissions?")
 	}
 }
 
