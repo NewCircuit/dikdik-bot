@@ -123,25 +123,26 @@ func (bot Bot) onStatus(msg *dg.MessageCreate) {
 	bot.good(msg.Message)
 }
 
-func (bot Bot) onAttach(s *dg.Session, attmsg *dg.MessageAttachment, msg *dg.MessageCreate) {
-	//checks to see if attachment message contains text/a title
-	// if msg.Content != "" {
-	// 	//posts message content and url to other channel
-	// 	message, err := bot.client.ChannelMessageSend(
-	// 		bot.allVars.m[msg.Author.Username],
-	// 		msg.Content+" "+attmsg.URL,
-	// 	)
-	// 	if err != nil {
-	// 		fmt.Println(err)
-	// 	}
-	// 	//record message id that was posted to other channel
-	// 	bot.allVars.dm[bot.allVars.m[msg.Author.Username]] = message.ID
-	// } else {
-	// 	//message doesnt contain content
-	// 	message, err := bot.client.ChannelMessageSend(bot.allVars.m[msg.Author.Username], attmsg.URL)
-	// 	if err != nil {
-	// 		fmt.Println(err)
-	// 	}
-	// 	bot.allVars.dm[bot.allVars.m[msg.Author.Username]] = message.ID
-	// }
-}
+// TODO: make this
+// func (bot Bot) onAttach(s *dg.Session, attmsg *dg.MessageAttachment, msg *dg.MessageCreate) {
+// 	//checks to see if attachment message contains text/a title
+// 	// if msg.Content != "" {
+// 	// 	//posts message content and url to other channel
+// 	// 	message, err := bot.client.ChannelMessageSend(
+// 	// 		bot.allVars.m[msg.Author.Username],
+// 	// 		msg.Content+" "+attmsg.URL,
+// 	// 	)
+// 	// 	if err != nil {
+// 	// 		fmt.Println(err)
+// 	// 	}
+// 	// 	//record message id that was posted to other channel
+// 	// 	bot.allVars.dm[bot.allVars.m[msg.Author.Username]] = message.ID
+// 	// } else {
+// 	// 	//message doesnt contain content
+// 	// 	message, err := bot.client.ChannelMessageSend(bot.allVars.m[msg.Author.Username], attmsg.URL)
+// 	// 	if err != nil {
+// 	// 		fmt.Println(err)
+// 	// 	}
+// 	// 	bot.allVars.dm[bot.allVars.m[msg.Author.Username]] = message.ID
+// 	// }
+// }
