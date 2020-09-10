@@ -75,7 +75,7 @@ func buildEmbed(config *DikDikConfig) *dg.MessageEmbed {
 			"Delete last sent message while say is active\n"+
 			"`{prefix}joke <optional channel>`\n"+
 			"Post a joke, or in a given channel\n"+
-			"`{prefix}facts <optional channel>`\n"+
+			"`{prefix}fact <optional channel>`\n"+
 			"Post a fact, or in a given channel\n"+
 			"`{prefix}status`\n"+
 			"Confirm if say is currently active\n"+
