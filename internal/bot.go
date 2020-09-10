@@ -105,6 +105,30 @@ func (bot Bot) buildEmbed() dg.MessageEmbed {
 	return embed
 }
 
+func (bot Bot) bad(msg *dg.Message) {
+	bot.react(msg, "❌")
+}
+
+func (bot Bot) good(msg *dg.Message) {
+	bot.react(msg, "✅")
+}
+
+func (bot Bot) sent(msg *dg.Message) {
+	bot.react(msg, "📧")
+}
+
+func (bot Bot) react(msg *dg.Message, emoji string) {
+	err := bot.client.MessageReactionAdd(
+		msg.ChannelID,
+		msg.ID,
+		emoji,
+	)
+
+	if err != nil {
+		log.Println("Failed to react to a command", err)
+	}
+}
+
 func readFile(filename string) []string {
 	//read file
 	file, err := ioutil.ReadFile(filename)

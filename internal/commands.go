@@ -4,6 +4,7 @@ import (
 	"fmt"
 	util "github.com/Floor-Gang/utilpkg/botutil"
 	dg "github.com/bwmarrin/discordgo"
+	"log"
 	"math/rand"
 	"time"
 )
@@ -48,19 +49,22 @@ func (bot Bot) onFact(msg *dg.MessageCreate, args []string) {
 
 	_, err := bot.client.ChannelMessageSend(channelID, bot.facts[randomIndex])
 	if err != nil {
-		fmt.Println(err)
+		log.Println("Failed to send fact", err)
+		bot.bad(msg.Message)
+	} else {
+		bot.good(msg.Message)
 	}
-
 }
 
 //+say command
 func (bot Bot) onSet(msg *dg.MessageCreate, args []string) {
 	if len(args) > 0 {
 		channelID := util.FilterTag(args[0])
-		channel, err := bot.client.Channel(channelID)
+		_, err := bot.client.Channel(channelID)
 
 		if err != nil {
-			util.Reply(bot.client, msg.Message, "Couldn't find "+args[0])
+			log.Println("Couldn't find " + args[0])
+			bot.bad(msg.Message)
 			return
 		}
 
@@ -73,14 +77,11 @@ func (bot Bot) onSet(msg *dg.MessageCreate, args []string) {
 
 		bot.channels[channelMap.user] = channelMap
 
-		util.Reply(bot.client, msg.Message, "Now talking in "+channel.Mention())
+		bot.good(msg.Message)
 
-	} else {
-		_, err := bot.client.ChannelMessageSend(msg.ChannelID, "Invalid Channel. Use /help to see commands")
-		if err != nil {
-			fmt.Println(err)
-		}
+		return
 	}
+	bot.bad(msg.Message)
 }
 
 //text while say command is active
@@ -96,8 +97,9 @@ func (bot Bot) onText(msg *dg.MessageCreate, channelMap *ChannelMap) {
 
 	if err == nil {
 		channelMap.messages[msg.ID] = msgSent.ID
+		bot.sent(msg.Message)
 	} else {
-		_, _ = util.Reply(bot.client, msg.Message, "Failed to send message. Do I have permissions?")
+		bot.bad(msg.Message)
 	}
 }
 
