@@ -89,14 +89,10 @@ func (bot Bot) buildEmbed() dg.MessageEmbed {
 				"Deactivate message sending to MentionChannel\n"+
 				"`{prefix}delete`\n"+
 				"Delete last sent message while say is active\n"+
-				"`{prefix}jokeHere`\n"+
-				"Post a joke in current channel\n"+
-				"`{prefix}jokeThere MentionChannel`\n"+
-				"Send joke to the MentionedChannel\n"+
-				"`{prefix}factsHere`\n"+
-				"Post facts in current channel\n"+
-				"`{prefix}factsThere MentionChannel`\n"+
-				"Send facts to the MentionedChannel\n"+
+				"`{prefix}joke <optional channel>`\n"+
+				"Post a joke, or in a given channel\n"+
+				"`{prefix}facts <optional channel>`\n"+
+				"Post a fact, or in a given channel\n"+
 				"`{prefix}status`\n"+
 				"Confirm if say is currently active\n"+
 				"`{prefix}help`", "{prefix}", bot.config.Prefix, -1)
