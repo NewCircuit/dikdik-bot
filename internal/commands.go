@@ -119,45 +119,29 @@ func (bot Bot) onUnset(msg *dg.MessageCreate) {
 
 //checks if say is active
 func (bot Bot) onStatus(msg *dg.MessageCreate) {
-	// //if user exists in map say active
-	// if err, exists := bot.allVars.m[msg.Author.Username]; exists {
-	// 	if err != "" {
-	// 		fmt.Println(err)
-	// 	}
-	// 	_, err := bot.client.ChannelMessageSend(
-	// 		msg.ChannelID,
-	// 		"Say is currently active for "+msg.Author.Username+" in channel "+
-	// 			"<#"+bot.allVars.m[msg.Author.Username]+">",
-	// 	)
-	// 	if err != nil {
-	// 		fmt.Println(err)
-	// 	}
-	// 	_, errd := bot.client.ChannelMessageSend(
-	// 		msg.ChannelID,
-	// 		"Thanks for checking in. I'm still a piece of garbage",
-	// 	)
-	// 	if errd != nil {
-	// 		fmt.Println(errd)
-	// 	}
+	channelMap, isOK := bot.channels[msg.Author.ID]
 
-	// } else {
-	// 	//user doesnt exist in map- not active
-	// 	_, err := bot.client.ChannelMessageSend(
-	// 		msg.ChannelID,
-	// 		"Say is not currently active for "+msg.Author.Username,
-	// 	)
-	// 	if err != nil {
-	// 		fmt.Println(err)
-	// 	}
-	// 	_, errd := bot.client.ChannelMessageSend(
-	// 		msg.ChannelID,
-	// 		"Thanks for checking in. I'm still a piece of garbage",
-	// 	)
-	// 	if errd != nil {
-	// 		fmt.Println(errd)
-	// 	}
+	if !isOK {
+		util.Reply(bot.client, msg.Message, "You are currently not talking in any channels.")
+	} else {
+		var response string
 
-	// }
+		if msg.ChannelID == channelMap.from {
+			response = fmt.Sprintf(
+				"Your messages in here are sent to <#%s>",
+				channelMap.to,
+			)
+		} else {
+			response = fmt.Sprintf(
+				"Your messages in <#%s> are sent to <#%s>",
+				channelMap.from,
+				channelMap.to,
+			)
+		}
+
+		util.Reply(bot.client, msg.Message, response)
+	}
+	bot.good(msg.Message)
 }
 
 func (bot Bot) onAttach(s *dg.Session, attmsg *dg.MessageAttachment, msg *dg.MessageCreate) {
