@@ -96,13 +96,19 @@ func (bot Bot) onSet(s *dg.Session, msg *dg.MessageCreate, arg []string) {
 			}
 			//record message id that was posted to other channel
 			bot.allVars.dm[bot.allVars.m[msg.Author.Username]] = message.ID
-			_, errd := s.ChannelMessageSend(msg.ChannelID, "You are now sending messages to <#"+arg[1]+">")
-			if errd != nil {
+			_, err = s.ChannelMessageSend(
+				msg.ChannelID,
+				"You are now sending messages to <#"+arg[1]+">",
+			)
+			if err != nil {
 				fmt.Println(errd)
 			}
 
 		} else {
-			_, err := s.ChannelMessageSend(msg.ChannelID, "You are currently sending messages to <#"+bot.allVars.m[msg.Author.Username]+">")
+			_, err := s.ChannelMessageSend(
+				msg.ChannelID,
+				"You are currently sending messages to <#"+bot.allVars.m[msg.Author.Username]+">",
+			)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -134,7 +140,10 @@ func (bot Bot) onText(s *dg.Session, msg *dg.MessageCreate) {
 				//check if message contains content
 				if msg.Content != "" {
 					//posts all messages to other channels
-					message, err := s.ChannelMessageSend(bot.allVars.m[msg.Author.Username], msg.Content)
+					message, err := s.ChannelMessageSend(
+						bot.allVars.m[msg.Author.Username],
+						msg.Content,
+					)
 					if err != nil {
 						fmt.Println(err)
 					}
@@ -177,8 +186,11 @@ func (bot Bot) onUnset(s *dg.Session, msg *dg.MessageCreate, arg []string) {
 			fmt.Println(err)
 		}
 		//if user exists delete record in map
-		_, err := s.ChannelMessageSend(msg.ChannelID,
-			"You are no longer sending messages to channel <#"+bot.allVars.m[msg.Author.Username]+">")
+		_, err := s.ChannelMessageSend(
+			msg.ChannelID,
+			"You are no longer sending messages to channel "+
+				"<#"+bot.allVars.m[msg.Author.Username]+">",
+		)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -190,7 +202,10 @@ func (bot Bot) onUnset(s *dg.Session, msg *dg.MessageCreate, arg []string) {
 		delete(bot.allVars.cm, msg.Author.Username)
 	} else {
 		//if user doesnt exist return
-		_, err := s.ChannelMessageSend(msg.ChannelID, "Say is not currently active for "+msg.Author.Username)
+		_, err := s.ChannelMessageSend(
+			msg.ChannelID,
+			"Say is not currently active for "+msg.Author.Username,
+		)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -201,7 +216,10 @@ func (bot Bot) onUnset(s *dg.Session, msg *dg.MessageCreate, arg []string) {
 func (bot Bot) onDelete(s *dg.Session, msg *dg.MessageCreate) {
 	//checks if user exists- last message contains a value
 	if _, exists := bot.allVars.dm[bot.allVars.m[msg.Author.Username]]; exists {
-		s.ChannelMessageDelete(bot.allVars.m[msg.Author.Username], bot.allVars.dm[bot.allVars.m[msg.Author.Username]])
+		s.ChannelMessageDelete(
+			bot.allVars.m[msg.Author.Username],
+			bot.allVars.dm[bot.allVars.m[msg.Author.Username]],
+		)
 		s.ChannelMessageSend(msg.ChannelID, "The message has been deleted")
 	} else {
 		//if user doesnt exist return
@@ -216,23 +234,35 @@ func (bot Bot) onStatus(s *dg.Session, msg *dg.MessageCreate) {
 		if err != "" {
 			fmt.Println(err)
 		}
-		_, err := s.ChannelMessageSend(msg.ChannelID, "Say is currently active for "+msg.Author.Username+" in channel <#"+
-			bot.allVars.m[msg.Author.Username]+">")
+		_, err := s.ChannelMessageSend(
+			msg.ChannelID,
+			"Say is currently active for "+msg.Author.Username+" in channel "+
+				"<#"+bot.allVars.m[msg.Author.Username]+">",
+		)
 		if err != nil {
 			fmt.Println(err)
 		}
-		_, errd := s.ChannelMessageSend(msg.ChannelID, "Thanks for checking in. I'm still a piece of garbage")
+		_, errd := s.ChannelMessageSend(
+			msg.ChannelID,
+			"Thanks for checking in. I'm still a piece of garbage",
+		)
 		if errd != nil {
 			fmt.Println(errd)
 		}
 
 	} else {
 		//user doesnt exist in map- not active
-		_, err := s.ChannelMessageSend(msg.ChannelID, "Say is not currently active for "+msg.Author.Username)
+		_, err := s.ChannelMessageSend(
+			msg.ChannelID,
+			"Say is not currently active for "+msg.Author.Username,
+		)
 		if err != nil {
 			fmt.Println(err)
 		}
-		_, errd := s.ChannelMessageSend(msg.ChannelID, "Thanks for checking in. I'm still a piece of garbage")
+		_, errd := s.ChannelMessageSend(
+			msg.ChannelID,
+			"Thanks for checking in. I'm still a piece of garbage",
+		)
 		if errd != nil {
 			fmt.Println(errd)
 		}
@@ -244,7 +274,10 @@ func (bot Bot) onAttach(s *dg.Session, attmsg *dg.MessageAttachment, msg *dg.Mes
 	//checks to see if attachment message contains text/a title
 	if msg.Content != "" {
 		//posts message content and url to other channel
-		message, err := s.ChannelMessageSend(bot.allVars.m[msg.Author.Username], msg.Content+" "+attmsg.URL)
+		message, err := s.ChannelMessageSend(
+			bot.allVars.m[msg.Author.Username],
+			msg.Content+" "+attmsg.URL,
+		)
 		if err != nil {
 			fmt.Println(err)
 		}

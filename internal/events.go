@@ -58,7 +58,10 @@ func (bot *Bot) onMessage(s *dg.Session, msg *dg.MessageCreate) {
 					if err != nil {
 						fmt.Println(args[1], err)
 						// Could not find channel.
-						_, err := s.ChannelMessageSend(msg.ChannelID, "Invalid Channel. Use /help to see commands")
+						_, err := s.ChannelMessageSend(
+							msg.ChannelID,
+							"Invalid Channel. Use /help to see commands",
+						)
 						if err != nil {
 							fmt.Println(err)
 						}
@@ -69,7 +72,10 @@ func (bot *Bot) onMessage(s *dg.Session, msg *dg.MessageCreate) {
 					if err != nil {
 						fmt.Println(args[1], err)
 						// Could not find channel.
-						_, err := s.ChannelMessageSend(msg.ChannelID, "Invalid Channel. Use /help to see commands")
+						_, err := s.ChannelMessageSend(
+							msg.ChannelID,
+							"Invalid Channel. Use /help to see commands",
+						)
 						if err != nil {
 							fmt.Println(err)
 						}
@@ -122,7 +128,11 @@ func (bot Bot) onEdit(s *dg.Session, editmsg *dg.MessageUpdate) {
 		if _, exists := bot.allVars.m[editmsg.Author.Username]; exists {
 
 			//edit message in other channel
-			_, err := s.ChannelMessageEdit(bot.allVars.m[editmsg.Author.Username], bot.allVars.dm[bot.allVars.m[editmsg.Author.Username]], editmsg.Content)
+			_, err := s.ChannelMessageEdit(
+				bot.allVars.m[editmsg.Author.Username],
+				bot.allVars.dm[bot.allVars.m[editmsg.Author.Username]],
+				editmsg.Content,
+			)
 			if err != nil {
 				fmt.Println(err)
 			}
