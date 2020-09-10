@@ -15,6 +15,10 @@ type Bot struct {
 	botPrefix string
 	client    *dg.Session
 	allVars   Variables1
+	//create joke array
+	jokes []string
+	//create fact array
+	facts []string
 }
 
 type Variables1 struct {
@@ -28,15 +32,10 @@ type Variables1 struct {
 	cm map[string]string
 
 	ourBool bool
-
 	//duration between last message and current message
 	between time.Duration
 	//time until timeout and deactivate say automatically
 	sayoffTime float64
-	//create joke array
-	jokelist []string
-	//create fact array
-	factlist []string
 }
 
 func Start(config DikDikConfig) {
@@ -58,9 +57,8 @@ func Start(config DikDikConfig) {
 	}
 
 	//loads files
-	bot.allVars.jokelist = readFile(config.CSVPathJokes)
-	bot.allVars.factlist = readFile(config.CSVPathFacts)
-	fmt.Println("files read")
+	bot.jokes = readFile(config.JokesPath)
+	bot.facts = readFile(config.FactsPath)
 
 	//confirm client opened properly
 	if err := client.Open(); err != nil {
@@ -91,23 +89,24 @@ func (bot Bot) buildEmbed() dg.MessageEmbed {
 		embed.Color = 0x1385ef
 		embed.Title = "Commands"
 		//only join when first creating
-		embed.Description = "`/+say channelName [message to send to channel]`\n" +
-			"Activate message sending to MentionedChannel. All messages you send hereafter will be send to this channel\n" +
-			"`/-say`\n" +
-			"Deactivate message sending to MentionChannel\n" +
-			"`/delete`\n" +
-			"Delete last sent message while say is active\n" +
-			"`/jokeHere`\n" +
-			"Post a joke in current channel\n" +
-			"`/jokeThere MentionChannel`\n" +
-			"Send joke to the MentionedChannel\n" +
-			"`/factsHere`\n" +
-			"Post facts in current channel\n" +
-			"`/factsThere MentionChannel`\n" +
-			"Send facts to the MentionedChannel\n" +
-			"`/status`\n" +
-			"Confirm if say is currently active\n" +
-			"`/help`"
+		embed.Description = strings.Replace(
+			"`{prefix}+say channelName [message to send to channel]`\n"+
+				"Activate message sending to MentionedChannel. All messages you send hereafter will be send to this channel\n"+
+				"`{prefix}-say`\n"+
+				"Deactivate message sending to MentionChannel\n"+
+				"`{prefix}delete`\n"+
+				"Delete last sent message while say is active\n"+
+				"`{prefix}jokeHere`\n"+
+				"Post a joke in current channel\n"+
+				"`{prefix}jokeThere MentionChannel`\n"+
+				"Send joke to the MentionedChannel\n"+
+				"`{prefix}factsHere`\n"+
+				"Post facts in current channel\n"+
+				"`{prefix}factsThere MentionChannel`\n"+
+				"Send facts to the MentionedChannel\n"+
+				"`{prefix}status`\n"+
+				"Confirm if say is currently active\n"+
+				"`{prefix}help`", "{prefix}", bot.config.Prefix, -1)
 		bot.allVars.ourBool = true
 		return embed
 	}

@@ -7,10 +7,10 @@ import (
 )
 
 type DikDikConfig struct {
-	Token        string `yaml:"bot_token"`
-	Prefix       string `yaml:"bot_prefix"`
-	CSVPathJokes string `yaml:"jokes_path"`
-	CSVPathFacts string `yaml:"facts_path"`
+	Token     string `yaml:"bot_token"`
+	Prefix    string `yaml:"bot_prefix"`
+	JokesPath string `yaml:"jokes_path"`
+	FactsPath string `yaml:"facts_path"`
 }
 
 const defaultPath = "dikdik-config.yml"
@@ -23,11 +23,12 @@ func GetConfig() (config DikDikConfig) {
 	}
 
 	config = DikDikConfig{
-		Prefix: "!",
+		Prefix:    "!",
+		JokesPath: "./jokes.txt",
+		FactsPath: "./facts.txt",
 	}
 
-	err := util.GetConfig(configPath, &config)
-	if err != nil {
+	if err := util.GetConfig(configPath, &config); err != nil {
 		log.Fatalln(err)
 	}
 

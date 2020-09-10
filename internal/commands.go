@@ -23,8 +23,8 @@ func (bot Bot) onJokeThere(s *dg.Session, msg *dg.MessageCreate, arg []string) {
 	//confirm channel ID exists
 	if len(arg[:]) > 1 {
 		rand.Seed(time.Now().UnixNano())
-		randomIndex := rand.Intn(len(bot.allVars.jokelist))
-		_, err := s.ChannelMessageSend(arg[1], bot.allVars.jokelist[randomIndex])
+		randomIndex := rand.Intn(len(bot.jokes))
+		_, err := s.ChannelMessageSend(arg[1], bot.jokes[randomIndex])
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -40,8 +40,8 @@ func (bot Bot) onJokeThere(s *dg.Session, msg *dg.MessageCreate, arg []string) {
 func (bot Bot) onJokeHere(s *dg.Session, msg *dg.MessageCreate) {
 	//creates a random seed
 	rand.Seed(time.Now().UnixNano())
-	randomIndex := rand.Intn(len(bot.allVars.jokelist))
-	_, err := s.ChannelMessageSend(msg.ChannelID, bot.allVars.jokelist[randomIndex])
+	randomIndex := rand.Intn(len(bot.jokes))
+	_, err := s.ChannelMessageSend(msg.ChannelID, bot.jokes[randomIndex])
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -52,8 +52,8 @@ func (bot Bot) onFactsThere(s *dg.Session, msg *dg.MessageCreate, arg []string) 
 	//confirm channel ID exists
 	if len(arg[:]) > 1 {
 		rand.Seed(time.Now().UnixNano())
-		randomIndex := rand.Intn(len(bot.allVars.factlist))
-		_, err := s.ChannelMessageSend(arg[1], bot.allVars.factlist[randomIndex])
+		randomIndex := rand.Intn(len(bot.facts))
+		_, err := s.ChannelMessageSend(arg[1], bot.facts[randomIndex])
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -69,8 +69,8 @@ func (bot Bot) onFactsThere(s *dg.Session, msg *dg.MessageCreate, arg []string) 
 func (bot Bot) onFactsHere(s *dg.Session, msg *dg.MessageCreate) {
 	//creates a random seed
 	rand.Seed(time.Now().UnixNano())
-	randomIndex := rand.Intn(len(bot.allVars.factlist))
-	_, err := s.ChannelMessageSend(msg.ChannelID, bot.allVars.factlist[randomIndex])
+	randomIndex := rand.Intn(len(bot.facts))
+	_, err := s.ChannelMessageSend(msg.ChannelID, bot.facts[randomIndex])
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -101,7 +101,7 @@ func (bot Bot) onSet(s *dg.Session, msg *dg.MessageCreate, arg []string) {
 				"You are now sending messages to <#"+arg[1]+">",
 			)
 			if err != nil {
-				fmt.Println(errd)
+				fmt.Println(err)
 			}
 
 		} else {
