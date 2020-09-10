@@ -23,7 +23,7 @@ func GetConfig() (config DikDikConfig) {
 	}
 
 	config = DikDikConfig{
-		Prefix: "/",
+		Prefix: "!",
 	}
 
 	err := util.GetConfig(configPath, &config)
