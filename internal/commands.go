@@ -93,6 +93,7 @@ func (bot Bot) onUnset(msg *dg.MessageCreate) {
 		return
 	}
 
+	bot.good(msg.Message)
 	delete(bot.channels, msg.Author.ID)
 }
 
