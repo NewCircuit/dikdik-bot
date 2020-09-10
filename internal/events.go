@@ -8,15 +8,11 @@ import (
 )
 
 func (bot *Bot) onMessage(s *dg.Session, msg *dg.MessageCreate) {
-	if msg.Author.Bot {
+	if msg.Author.Bot || len(msg.GuildID) == 0 {
 		return
 	}
 	//confirm prefix is correct
-	if len(msg.GuildID) == 0 {
-		return
-	} else if !strings.HasPrefix(msg.Content, bot.config.Prefix) &&
-		!strings.HasPrefix(msg.Content, "`"+bot.config.Prefix) &&
-		!strings.HasPrefix(msg.Content, "``"+bot.config.Prefix) {
+	if !strings.HasPrefix(msg.Content, bot.config.Prefix) {
 		//confirms user is commenting in the correct channel
 		if msg.ChannelID == bot.allVars.cm[msg.Author.Username] {
 			//confirms say is active for user and posts all messages to other channel
@@ -25,101 +21,41 @@ func (bot *Bot) onMessage(s *dg.Session, msg *dg.MessageCreate) {
 					fmt.Println(err)
 				}
 				bot.onText(s, msg)
-			} else {
-				return
-			}
-		} else {
-			return
-		}
-	} else {
-		//split string
-		args := strings.Split(""+msg.Content, " ")
-		//used specifically on say to clean up text
-		if len(args[:]) > 1 {
-			if args[0] == bot.config.Prefix+"+say" {
-				if len(args[:]) > 2 {
-					args[2] = strings.Join(args[2:], " ")
-					//makes sure all spaces are trimmed from front and back
-					for i, arg := range args {
-						args[i] = strings.TrimSpace(arg)
-						//stops trimming so it doesnt remove spaces from arg[2]
-						if args[i] == args[2] {
-							break
-						}
-					}
-				}
-			}
-			//confirms channel is correct if id is used instead of tagging channel
-			if len(args[:]) > 1 {
-				if len(args[1]) > 19 && strings.Contains(args[1], "<") {
-					runes2 := []rune(args[1])
-					args[1] = string(runes2[2:20])
-					_, err := s.State.Channel(args[1])
-					if err != nil {
-						fmt.Println(args[1], err)
-						// Could not find channel.
-						_, err := s.ChannelMessageSend(
-							msg.ChannelID,
-							"Invalid Channel. Use /help to see commands",
-						)
-						if err != nil {
-							fmt.Println(err)
-						}
-						return
-					}
-				} else {
-					_, err := s.State.Channel(args[1])
-					if err != nil {
-						fmt.Println(args[1], err)
-						// Could not find channel.
-						_, err := s.ChannelMessageSend(
-							msg.ChannelID,
-							"Invalid Channel. Use /help to see commands",
-						)
-						if err != nil {
-							fmt.Println(err)
-						}
-						return
-					}
-				}
 			}
 		}
+		return
+	}
 
-		//cut the / off the first string
-		runes := []rune(args[0])
-		args[0] = string(runes[1:])
-		//check first arg to decide how to proceed
-		args[0] = strings.ToLower(args[0])
-		switch args[0] {
-		case "+say":
-			bot.onSet(s, msg, args[:])
-			break
-		case "-say":
-			bot.onUnset(s, msg, args[:])
-		case "jokethere":
-			bot.onJokeThere(s, msg, args[:])
-			break
-		case "factsthere":
-			bot.onFactsThere(s, msg, args[:])
-			break
-		case "factshere":
-			bot.onFactsHere(s, msg)
-			break
-		case "jokehere":
-			bot.onJokeHere(s, msg)
-			break
-		case "help":
-			bot.onHelp(s, msg)
-			break
-		case "delete":
-			bot.onDelete(s, msg)
-			break
-		case "status":
-			bot.onStatus(s, msg)
-			break
-		default:
-			break
-		}
+	//split string
+	body := strings.ToLower(msg.Content[len(bot.config.Prefix):])
+	args := strings.Split(body, " ")
+
+	switch args[0] {
+	case "+say":
+		bot.onSet(s, msg, args)
+		break
+	case "-say":
+		bot.onUnset(s, msg, args)
+	case "joke":
+		bot.onJoke(s, msg, args)
+		break
+	case "factsthere":
+		bot.onFactsThere(s, msg, args)
+		break
+	case "factshere":
+		bot.onFactsHere(s, msg)
+		break
+	case "help":
+		bot.onHelp(s, msg)
+		break
+	case "delete":
+		bot.onDelete(s, msg)
+		break
+	case "status":
+		bot.onStatus(s, msg)
+		break
+	default:
+		break
 	}
 }
 

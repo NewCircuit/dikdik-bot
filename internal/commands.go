@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	util "github.com/Floor-Gang/utilpkg/botutil"
 	dg "github.com/bwmarrin/discordgo"
 	"math/rand"
 	"strconv"
@@ -18,30 +19,20 @@ func (bot Bot) onHelp(s *dg.Session, msg *dg.MessageCreate) {
 	}
 }
 
-//jokeThere command
-func (bot Bot) onJokeThere(s *dg.Session, msg *dg.MessageCreate, arg []string) {
-	//confirm channel ID exists
-	if len(arg[:]) > 1 {
-		rand.Seed(time.Now().UnixNano())
-		randomIndex := rand.Intn(len(bot.jokes))
-		_, err := s.ChannelMessageSend(arg[1], bot.jokes[randomIndex])
-		if err != nil {
-			fmt.Println(err)
-		}
-	} else {
-		_, err := s.ChannelMessageSend(msg.ChannelID, "Invalid Channel. Use /help to see commands")
-		if err != nil {
-			fmt.Println(err)
-		}
-	}
-}
-
 //jokeHere command
-func (bot Bot) onJokeHere(s *dg.Session, msg *dg.MessageCreate) {
+func (bot Bot) onJoke(s *dg.Session, msg *dg.MessageCreate, args []string) {
 	//creates a random seed
 	rand.Seed(time.Now().UnixNano())
 	randomIndex := rand.Intn(len(bot.jokes))
-	_, err := s.ChannelMessageSend(msg.ChannelID, bot.jokes[randomIndex])
+	var channel string
+
+	if len(args) > 1 {
+		channel = util.FilterTag(args[1])
+	} else {
+		channel = msg.ChannelID
+	}
+
+	_, err := s.ChannelMessageSend(channel, bot.jokes[randomIndex])
 	if err != nil {
 		fmt.Println(err)
 	}
