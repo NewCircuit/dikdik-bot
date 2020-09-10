@@ -27,12 +27,15 @@ func (bot Bot) onJoke(msg *dg.MessageCreate, args []string) {
 	channelID := msg.ChannelID
 
 	if len(args) > 0 {
-		channelID = util.FilterTag(args[1])
+		channelID = util.FilterTag(args[0])
 	}
 
 	_, err := bot.client.ChannelMessageSend(channelID, bot.jokes[randomIndex])
 	if err != nil {
-		fmt.Println(err)
+		log.Println("Failed to send joke", err)
+		bot.bad(msg.Message)
+	} else {
+		bot.good(msg.Message)
 	}
 }
 

@@ -43,15 +43,17 @@ func (bot *Bot) onMessage(s *dg.Session, msg *dg.MessageCreate) {
 }
 
 func (bot Bot) onEdit(_ *dg.Session, msg *dg.MessageUpdate) {
-	channelMap, isOK := bot.channels[msg.Author.ID]
+	if msg.Author != nil {
+		channelMap, isOK := bot.channels[msg.Author.ID]
 
-	if isOK {
-		editing, isOK := channelMap.messages[msg.ID]
+		if isOK {
+			editing, isOK := channelMap.messages[msg.ID]
 
-		if !isOK {
-			return
+			if !isOK {
+				return
+			}
+			bot.client.ChannelMessageEdit(channelMap.to, editing, msg.Content)
 		}
-		bot.client.ChannelMessageEdit(channelMap.to, editing, msg.Content)
 	}
 }
 
