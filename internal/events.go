@@ -9,18 +9,17 @@ func (bot *Bot) onMessage(s *dg.Session, msg *dg.MessageCreate) {
 	if msg.Author.Bot || len(msg.GuildID) == 0 {
 		return
 	}
-	//confirm prefix is correct
+
 	if !strings.HasPrefix(msg.Content, bot.config.Prefix) {
 		channelMap, isOK := bot.channels[msg.Author.ID]
 
 		if isOK && channelMap.from == msg.ChannelID {
-			bot.onText(msg, channelMap)
+			bot.relayMessage(msg, channelMap)
 		}
 
 		return
 	}
 
-	//split string
 	body := strings.ToLower(msg.Content[len(bot.config.Prefix):])
 	args := strings.Split(body, " ")
 

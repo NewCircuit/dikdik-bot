@@ -87,7 +87,7 @@ func (bot Bot) onSet(msg *dg.MessageCreate, args []string) {
 	bot.bad(msg.Message)
 }
 
-//text while say command is active
+// text while say command is active
 func (bot Bot) onText(msg *dg.MessageCreate, channelMap *ChannelMap) {
 	_, err := bot.client.Channel(channelMap.to)
 

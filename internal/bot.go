@@ -101,6 +101,25 @@ func (bot Bot) buildEmbed() dg.MessageEmbed {
 	return embed
 }
 
+// This is where the bot mimics a user
+func (bot Bot) relayMessage(msg *dg.MessageCreate, channelMap *ChannelMap) {
+	_, err := bot.client.Channel(channelMap.to)
+
+	if err != nil {
+		delete(bot.channels, msg.Author.ID)
+		return
+	}
+
+	msgSent, err := bot.client.ChannelMessageSend(channelMap.to, msg.Content)
+
+	if err == nil {
+		channelMap.messages[msg.ID] = msgSent.ID
+		bot.sent(msg.Message)
+	} else {
+		bot.bad(msg.Message)
+	}
+}
+
 func (bot Bot) bad(msg *dg.Message) {
 	bot.react(msg, "❌")
 }
