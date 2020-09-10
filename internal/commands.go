@@ -9,58 +9,44 @@ import (
 )
 
 //help command
-func (bot Bot) onHelp(s *dg.Session, msg *dg.MessageCreate) {
+func (bot Bot) onHelp(msg *dg.MessageCreate) {
 	//build string to display help/info/commands
 	embed := bot.buildEmbed()
-	_, err := s.ChannelMessageSendEmbed(msg.ChannelID, &embed)
+	_, err := bot.client.ChannelMessageSendEmbed(msg.ChannelID, &embed)
 	if err != nil {
 		fmt.Println(err)
 	}
 }
 
 //jokeHere command
-func (bot Bot) onJoke(s *dg.Session, msg *dg.MessageCreate, args []string) {
+func (bot Bot) onJoke(msg *dg.MessageCreate, args []string) {
 	//creates a random seed
 	rand.Seed(time.Now().UnixNano())
 	randomIndex := rand.Intn(len(bot.jokes))
-	var channel string
+	channelID := msg.ChannelID
 
-	if len(args) > 1 {
-		channel = util.FilterTag(args[1])
-	} else {
-		channel = msg.ChannelID
+	if len(args) > 0 {
+		channelID = util.FilterTag(args[1])
 	}
 
-	_, err := s.ChannelMessageSend(channel, bot.jokes[randomIndex])
+	_, err := bot.client.ChannelMessageSend(channelID, bot.jokes[randomIndex])
 	if err != nil {
 		fmt.Println(err)
 	}
 }
 
-//factsThere command
-func (bot Bot) onFactsThere(s *dg.Session, msg *dg.MessageCreate, arg []string) {
-	//confirm channel ID exists
-	if len(arg[:]) > 1 {
-		rand.Seed(time.Now().UnixNano())
-		randomIndex := rand.Intn(len(bot.facts))
-		_, err := s.ChannelMessageSend(arg[1], bot.facts[randomIndex])
-		if err != nil {
-			fmt.Println(err)
-		}
-	} else {
-		_, err := s.ChannelMessageSend(msg.ChannelID, "Invalid Channel. Use /help to see commands")
-		if err != nil {
-			fmt.Println(err)
-		}
-	}
-}
-
 //factsHere command
-func (bot Bot) onFactsHere(s *dg.Session, msg *dg.MessageCreate) {
+func (bot Bot) onFact(msg *dg.MessageCreate, args []string) {
 	//creates a random seed
 	rand.Seed(time.Now().UnixNano())
 	randomIndex := rand.Intn(len(bot.facts))
-	_, err := s.ChannelMessageSend(msg.ChannelID, bot.facts[randomIndex])
+	channelID := msg.ChannelID
+
+	if len(args) > 0 {
+		channelID = util.FilterTag(args[0])
+	}
+
+	_, err := bot.client.ChannelMessageSend(channelID, bot.facts[randomIndex])
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -68,7 +54,7 @@ func (bot Bot) onFactsHere(s *dg.Session, msg *dg.MessageCreate) {
 }
 
 //+say command
-func (bot Bot) onSet(s *dg.Session, msg *dg.MessageCreate, args []string) {
+func (bot Bot) onSet(msg *dg.MessageCreate, args []string) {
 	if len(args) > 0 {
 		channelID := util.FilterTag(args[0])
 		channel, err := bot.client.Channel(channelID)
@@ -90,7 +76,7 @@ func (bot Bot) onSet(s *dg.Session, msg *dg.MessageCreate, args []string) {
 		util.Reply(bot.client, msg.Message, "Now talking in "+channel.Mention())
 
 	} else {
-		_, err := s.ChannelMessageSend(msg.ChannelID, "Invalid Channel. Use /help to see commands")
+		_, err := bot.client.ChannelMessageSend(msg.ChannelID, "Invalid Channel. Use /help to see commands")
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -116,120 +102,78 @@ func (bot Bot) onText(msg *dg.MessageCreate, channelMap *ChannelMap) {
 }
 
 //-say command
-func (bot Bot) onUnset(s *dg.Session, msg *dg.MessageCreate, arg []string) {
-	//clear the channel topic
-	//turns out there is a long cool down on this so I cant use this
-	//s.ChannelEditComplex(msg.ChannelID, &discordgo.ChannelEdit{
-	//	Topic: "",
-	//})
-	if err, exists := bot.allVars.m[msg.Author.Username]; exists {
-		if err != "" {
-			fmt.Println(err)
-		}
-		//if user exists delete record in map
-		_, err := s.ChannelMessageSend(
-			msg.ChannelID,
-			"You are no longer sending messages to channel "+
-				"<#"+bot.allVars.m[msg.Author.Username]+">",
-		)
-		if err != nil {
-			fmt.Println(err)
-		}
+func (bot Bot) onUnset(msg *dg.MessageCreate) {
+	_, isOK := bot.channels[msg.Author.ID]
 
-		//clear all maps of user data
-		delete(bot.allVars.dm, bot.allVars.m[msg.Author.Username])
-		delete(bot.allVars.m, msg.Author.Username)
-		delete(bot.allVars.tm, msg.Author.Username)
-		delete(bot.allVars.cm, msg.Author.Username)
-	} else {
-		//if user doesnt exist return
-		_, err := s.ChannelMessageSend(
-			msg.ChannelID,
-			"Say is not currently active for "+msg.Author.Username,
-		)
-		if err != nil {
-			fmt.Println(err)
-		}
+	if !isOK {
+		return
 	}
-}
 
-//deletes message last posted in channel
-func (bot Bot) onDelete(s *dg.Session, msg *dg.MessageCreate) {
-	//checks if user exists- last message contains a value
-	if _, exists := bot.allVars.dm[bot.allVars.m[msg.Author.Username]]; exists {
-		s.ChannelMessageDelete(
-			bot.allVars.m[msg.Author.Username],
-			bot.allVars.dm[bot.allVars.m[msg.Author.Username]],
-		)
-		s.ChannelMessageSend(msg.ChannelID, "The message has been deleted")
-	} else {
-		//if user doesnt exist return
-		s.ChannelMessageSend(msg.ChannelID, "There is no prior message available to be deleted")
-	}
+	delete(bot.channels, msg.Author.ID)
 }
 
 //checks if say is active
-func (bot Bot) onStatus(s *dg.Session, msg *dg.MessageCreate) {
-	//if user exists in map say active
-	if err, exists := bot.allVars.m[msg.Author.Username]; exists {
-		if err != "" {
-			fmt.Println(err)
-		}
-		_, err := s.ChannelMessageSend(
-			msg.ChannelID,
-			"Say is currently active for "+msg.Author.Username+" in channel "+
-				"<#"+bot.allVars.m[msg.Author.Username]+">",
-		)
-		if err != nil {
-			fmt.Println(err)
-		}
-		_, errd := s.ChannelMessageSend(
-			msg.ChannelID,
-			"Thanks for checking in. I'm still a piece of garbage",
-		)
-		if errd != nil {
-			fmt.Println(errd)
-		}
+func (bot Bot) onStatus(msg *dg.MessageCreate) {
+	// //if user exists in map say active
+	// if err, exists := bot.allVars.m[msg.Author.Username]; exists {
+	// 	if err != "" {
+	// 		fmt.Println(err)
+	// 	}
+	// 	_, err := bot.client.ChannelMessageSend(
+	// 		msg.ChannelID,
+	// 		"Say is currently active for "+msg.Author.Username+" in channel "+
+	// 			"<#"+bot.allVars.m[msg.Author.Username]+">",
+	// 	)
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 	}
+	// 	_, errd := bot.client.ChannelMessageSend(
+	// 		msg.ChannelID,
+	// 		"Thanks for checking in. I'm still a piece of garbage",
+	// 	)
+	// 	if errd != nil {
+	// 		fmt.Println(errd)
+	// 	}
 
-	} else {
-		//user doesnt exist in map- not active
-		_, err := s.ChannelMessageSend(
-			msg.ChannelID,
-			"Say is not currently active for "+msg.Author.Username,
-		)
-		if err != nil {
-			fmt.Println(err)
-		}
-		_, errd := s.ChannelMessageSend(
-			msg.ChannelID,
-			"Thanks for checking in. I'm still a piece of garbage",
-		)
-		if errd != nil {
-			fmt.Println(errd)
-		}
+	// } else {
+	// 	//user doesnt exist in map- not active
+	// 	_, err := bot.client.ChannelMessageSend(
+	// 		msg.ChannelID,
+	// 		"Say is not currently active for "+msg.Author.Username,
+	// 	)
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 	}
+	// 	_, errd := bot.client.ChannelMessageSend(
+	// 		msg.ChannelID,
+	// 		"Thanks for checking in. I'm still a piece of garbage",
+	// 	)
+	// 	if errd != nil {
+	// 		fmt.Println(errd)
+	// 	}
 
-	}
+	// }
 }
 
 func (bot Bot) onAttach(s *dg.Session, attmsg *dg.MessageAttachment, msg *dg.MessageCreate) {
 	//checks to see if attachment message contains text/a title
-	if msg.Content != "" {
-		//posts message content and url to other channel
-		message, err := s.ChannelMessageSend(
-			bot.allVars.m[msg.Author.Username],
-			msg.Content+" "+attmsg.URL,
-		)
-		if err != nil {
-			fmt.Println(err)
-		}
-		//record message id that was posted to other channel
-		bot.allVars.dm[bot.allVars.m[msg.Author.Username]] = message.ID
-	} else {
-		//message doesnt contain content
-		message, err := s.ChannelMessageSend(bot.allVars.m[msg.Author.Username], attmsg.URL)
-		if err != nil {
-			fmt.Println(err)
-		}
-		bot.allVars.dm[bot.allVars.m[msg.Author.Username]] = message.ID
-	}
+	// if msg.Content != "" {
+	// 	//posts message content and url to other channel
+	// 	message, err := bot.client.ChannelMessageSend(
+	// 		bot.allVars.m[msg.Author.Username],
+	// 		msg.Content+" "+attmsg.URL,
+	// 	)
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 	}
+	// 	//record message id that was posted to other channel
+	// 	bot.allVars.dm[bot.allVars.m[msg.Author.Username]] = message.ID
+	// } else {
+	// 	//message doesnt contain content
+	// 	message, err := bot.client.ChannelMessageSend(bot.allVars.m[msg.Author.Username], attmsg.URL)
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 	}
+	// 	bot.allVars.dm[bot.allVars.m[msg.Author.Username]] = message.ID
+	// }
 }

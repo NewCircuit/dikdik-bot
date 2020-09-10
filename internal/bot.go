@@ -29,15 +29,6 @@ type ChannelMap struct {
 }
 
 type Variables1 struct {
-	//holds the author name and id of channel they are writing to
-	m map[string]string
-	//holds the author name and id of last message sent
-	dm map[string]string
-	//holds the time since last edit
-	tm map[string]time.Time
-	//holds the author and the id of the channel they are writing in
-	cm map[string]string
-
 	ourBool bool
 	//duration between last message and current message
 	between time.Duration
@@ -55,6 +46,8 @@ func Start(config DikDikConfig) {
 		sayoffTime: 5,
 	}
 
+	client.State.MaxMessageCount = 1000
+
 	//create bot
 	bot := Bot{
 		config:   config,
@@ -71,14 +64,6 @@ func Start(config DikDikConfig) {
 	if err := client.Open(); err != nil {
 		log.Fatalln("Failed to connect to Discord. Is token correct?\n" + err.Error())
 	}
-	//create message map
-	bot.allVars.m = make(map[string]string)
-	//create prior message map
-	bot.allVars.dm = make(map[string]string)
-	//create current channel map
-	bot.allVars.cm = make(map[string]string)
-	//create timestamp
-	bot.allVars.tm = make(map[string]time.Time)
 
 	//confirms bot is ready
 	fmt.Println("ready your dikdik")
@@ -86,6 +71,7 @@ func Start(config DikDikConfig) {
 	//initialize handlers
 	client.AddHandler(bot.onMessage)
 	client.AddHandler(bot.onEdit)
+	client.AddHandler(bot.onDelete)
 }
 
 //embed for the help menu thing
@@ -115,7 +101,6 @@ func (bot Bot) buildEmbed() dg.MessageEmbed {
 				"Confirm if say is currently active\n"+
 				"`{prefix}help`", "{prefix}", bot.config.Prefix, -1)
 		bot.allVars.ourBool = true
-		return embed
 	}
 	return embed
 }
