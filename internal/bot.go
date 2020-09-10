@@ -67,7 +67,7 @@ func buildEmbed(config *DikDikConfig) *dg.MessageEmbed {
 	}
 	//only join when first creating
 	embed.Description = strings.Replace(
-		"`{prefix}talk channelName [message to send to channel]`\n"+
+		"`{prefix}talk <channel>`\n"+
 			"Control the bot to talk in another channel\n"+
 			"`{prefix}stop`\n"+
 			"Deactivate message sending to MentionChannel\n"+
