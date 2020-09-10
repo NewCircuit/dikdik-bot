@@ -2,14 +2,14 @@ package internal
 
 import (
 	"fmt"
-	"github.com/bwmarrin/discordgo"
+	dg "github.com/bwmarrin/discordgo"
 	"math/rand"
 	"strconv"
 	"time"
 )
 
 //help command
-func (bot Bot) onHelp(s *discordgo.Session, msg *discordgo.MessageCreate) {
+func (bot Bot) onHelp(s *dg.Session, msg *dg.MessageCreate) {
 	//build string to display help/info/commands
 	embed := bot.buildEmbed()
 	_, err := s.ChannelMessageSendEmbed(msg.ChannelID, &embed)
@@ -19,7 +19,7 @@ func (bot Bot) onHelp(s *discordgo.Session, msg *discordgo.MessageCreate) {
 }
 
 //jokeThere command
-func (bot Bot) onJokeThere(s *discordgo.Session, msg *discordgo.MessageCreate, arg []string) {
+func (bot Bot) onJokeThere(s *dg.Session, msg *dg.MessageCreate, arg []string) {
 	//confirm channel ID exists
 	if len(arg[:]) > 1 {
 		rand.Seed(time.Now().UnixNano())
@@ -37,7 +37,7 @@ func (bot Bot) onJokeThere(s *discordgo.Session, msg *discordgo.MessageCreate, a
 }
 
 //jokeHere command
-func (bot Bot) onJokeHere(s *discordgo.Session, msg *discordgo.MessageCreate) {
+func (bot Bot) onJokeHere(s *dg.Session, msg *dg.MessageCreate) {
 	//creates a random seed
 	rand.Seed(time.Now().UnixNano())
 	randomIndex := rand.Intn(len(bot.allVars.jokelist))
@@ -48,7 +48,7 @@ func (bot Bot) onJokeHere(s *discordgo.Session, msg *discordgo.MessageCreate) {
 }
 
 //factsThere command
-func (bot Bot) onFactsThere(s *discordgo.Session, msg *discordgo.MessageCreate, arg []string) {
+func (bot Bot) onFactsThere(s *dg.Session, msg *dg.MessageCreate, arg []string) {
 	//confirm channel ID exists
 	if len(arg[:]) > 1 {
 		rand.Seed(time.Now().UnixNano())
@@ -66,7 +66,7 @@ func (bot Bot) onFactsThere(s *discordgo.Session, msg *discordgo.MessageCreate, 
 }
 
 //factsHere command
-func (bot Bot) onFactsHere(s *discordgo.Session, msg *discordgo.MessageCreate) {
+func (bot Bot) onFactsHere(s *dg.Session, msg *dg.MessageCreate) {
 	//creates a random seed
 	rand.Seed(time.Now().UnixNano())
 	randomIndex := rand.Intn(len(bot.allVars.factlist))
@@ -78,7 +78,7 @@ func (bot Bot) onFactsHere(s *discordgo.Session, msg *discordgo.MessageCreate) {
 }
 
 //+say command
-func (bot Bot) onSet(s *discordgo.Session, msg *discordgo.MessageCreate, arg []string) {
+func (bot Bot) onSet(s *dg.Session, msg *dg.MessageCreate, arg []string) {
 	//confirms there is a channel in the message
 	if len(arg[:]) > 1 {
 		//create map record of author and channel id where message is sent
@@ -118,7 +118,7 @@ func (bot Bot) onSet(s *discordgo.Session, msg *discordgo.MessageCreate, arg []s
 }
 
 //text while say command is active
-func (bot Bot) onText(s *discordgo.Session, msg *discordgo.MessageCreate) {
+func (bot Bot) onText(s *dg.Session, msg *dg.MessageCreate) {
 
 	if _, exists := bot.allVars.tm[msg.Author.Username]; exists {
 		//sets current time
@@ -166,7 +166,7 @@ func (bot Bot) onText(s *discordgo.Session, msg *discordgo.MessageCreate) {
 }
 
 //-say command
-func (bot Bot) onUnset(s *discordgo.Session, msg *discordgo.MessageCreate, arg []string) {
+func (bot Bot) onUnset(s *dg.Session, msg *dg.MessageCreate, arg []string) {
 	//clear the channel topic
 	//turns out there is a long cool down on this so I cant use this
 	//s.ChannelEditComplex(msg.ChannelID, &discordgo.ChannelEdit{
@@ -198,7 +198,7 @@ func (bot Bot) onUnset(s *discordgo.Session, msg *discordgo.MessageCreate, arg [
 }
 
 //deletes message last posted in channel
-func (bot Bot) onDelete(s *discordgo.Session, msg *discordgo.MessageCreate) {
+func (bot Bot) onDelete(s *dg.Session, msg *dg.MessageCreate) {
 	//checks if user exists- last message contains a value
 	if _, exists := bot.allVars.dm[bot.allVars.m[msg.Author.Username]]; exists {
 		s.ChannelMessageDelete(bot.allVars.m[msg.Author.Username], bot.allVars.dm[bot.allVars.m[msg.Author.Username]])
@@ -210,7 +210,7 @@ func (bot Bot) onDelete(s *discordgo.Session, msg *discordgo.MessageCreate) {
 }
 
 //checks if say is active
-func (bot Bot) onStatus(s *discordgo.Session, msg *discordgo.MessageCreate) {
+func (bot Bot) onStatus(s *dg.Session, msg *dg.MessageCreate) {
 	//if user exists in map say active
 	if err, exists := bot.allVars.m[msg.Author.Username]; exists {
 		if err != "" {
@@ -240,7 +240,7 @@ func (bot Bot) onStatus(s *discordgo.Session, msg *discordgo.MessageCreate) {
 	}
 }
 
-func (bot Bot) onAttach(s *discordgo.Session, attmsg *discordgo.MessageAttachment, msg *discordgo.MessageCreate) {
+func (bot Bot) onAttach(s *dg.Session, attmsg *dg.MessageAttachment, msg *dg.MessageCreate) {
 	//checks to see if attachment message contains text/a title
 	if msg.Content != "" {
 		//posts message content and url to other channel

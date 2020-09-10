@@ -2,12 +2,12 @@ package internal
 
 import (
 	"fmt"
-	"github.com/bwmarrin/discordgo"
+	dg "github.com/bwmarrin/discordgo"
 	"strings"
 	"time"
 )
 
-func (bot *Bot) onMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
+func (bot *Bot) onMessage(s *dg.Session, msg *dg.MessageCreate) {
 	if msg.Author.Bot {
 		return
 	}
@@ -117,7 +117,7 @@ func (bot *Bot) onMessage(s *discordgo.Session, msg *discordgo.MessageCreate) {
 	}
 }
 
-func (bot Bot) onEdit(s *discordgo.Session, editmsg *discordgo.MessageUpdate) {
+func (bot Bot) onEdit(s *dg.Session, editmsg *dg.MessageUpdate) {
 	if editmsg.EditedTimestamp != "" {
 		if _, exists := bot.allVars.m[editmsg.Author.Username]; exists {
 

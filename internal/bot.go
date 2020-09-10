@@ -2,7 +2,7 @@ package internal
 
 import (
 	"fmt"
-	"github.com/bwmarrin/discordgo"
+	dg "github.com/bwmarrin/discordgo"
 	"io/ioutil"
 	"log"
 	"strings"
@@ -13,7 +13,7 @@ import (
 type Bot struct {
 	config    DikDikConfig
 	botPrefix string
-	client    *discordgo.Session
+	client    *dg.Session
 	allVars   Variables1
 }
 
@@ -42,7 +42,7 @@ type Variables1 struct {
 func Start(config DikDikConfig) {
 
 	//initialize client
-	client, _ := discordgo.New("Bot " + config.Token)
+	client, _ := dg.New("Bot " + config.Token)
 	//set variables
 	varbs := Variables1{
 		ourBool:    false,
@@ -84,8 +84,8 @@ func Start(config DikDikConfig) {
 }
 
 //embed for the help menu thing
-func (bot Bot) buildEmbed() discordgo.MessageEmbed {
-	embed := discordgo.MessageEmbed{}
+func (bot Bot) buildEmbed() dg.MessageEmbed {
+	embed := dg.MessageEmbed{}
 	//check to see if embed is already built
 	if bot.allVars.ourBool == false {
 		embed.Color = 0x1385ef
