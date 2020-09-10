@@ -15,20 +15,20 @@ type DikDikConfig struct {
 
 const defaultPath = "dikdik-config.yml"
 
-func GetConfig() (config DikDikConfig) {
+func GetConfig() (config *DikDikConfig) {
 	configPath := os.Getenv("CONFIG_PATH")
 
 	if len(configPath) == 0 {
 		configPath = defaultPath
 	}
 
-	config = DikDikConfig{
+	config = &DikDikConfig{
 		Prefix:    "!",
 		JokesPath: "./jokes.txt",
 		FactsPath: "./facts.txt",
 	}
 
-	if err := util.GetConfig(configPath, &config); err != nil {
+	if err := util.GetConfig(configPath, config); err != nil {
 		log.Fatalln(err)
 	}
 

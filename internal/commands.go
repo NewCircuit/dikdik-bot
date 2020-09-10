@@ -11,9 +11,7 @@ import (
 
 //help command
 func (bot Bot) onHelp(msg *dg.MessageCreate) {
-	//build string to display help/info/commands
-	embed := bot.buildEmbed()
-	_, err := bot.client.ChannelMessageSendEmbed(msg.ChannelID, &embed)
+	_, err := bot.client.ChannelMessageSendEmbed(msg.ChannelID, bot.help)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -59,7 +57,7 @@ func (bot Bot) onFact(msg *dg.MessageCreate, args []string) {
 	}
 }
 
-//+say command
+// set the channel to send messages to for a user
 func (bot Bot) onSet(msg *dg.MessageCreate, args []string) {
 	if len(args) > 0 {
 		channelID := util.FilterTag(args[0])
@@ -85,25 +83,6 @@ func (bot Bot) onSet(msg *dg.MessageCreate, args []string) {
 		return
 	}
 	bot.bad(msg.Message)
-}
-
-// text while say command is active
-func (bot Bot) onText(msg *dg.MessageCreate, channelMap *ChannelMap) {
-	_, err := bot.client.Channel(channelMap.to)
-
-	if err != nil {
-		delete(bot.channels, msg.Author.ID)
-		return
-	}
-
-	msgSent, err := bot.client.ChannelMessageSend(channelMap.to, msg.Content)
-
-	if err == nil {
-		channelMap.messages[msg.ID] = msgSent.ID
-		bot.sent(msg.Message)
-	} else {
-		bot.bad(msg.Message)
-	}
 }
 
 //-say command

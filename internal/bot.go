@@ -6,16 +6,15 @@ import (
 	"io/ioutil"
 	"log"
 	"strings"
-	"time"
 )
 
 // Variables used for command line parameters
 type Bot struct {
-	config   DikDikConfig
+	config   *DikDikConfig
 	client   *dg.Session
+	help     *dg.MessageEmbed
 	jokes    []string
 	facts    []string
-	allVars  Variables1
 	channels map[string]*ChannelMap
 }
 
@@ -28,23 +27,10 @@ type ChannelMap struct {
 	messages map[string]string
 }
 
-type Variables1 struct {
-	ourBool bool
-	//duration between last message and current message
-	between time.Duration
-	//time until timeout and deactivate say automatically
-	sayoffTime float64
-}
-
-func Start(config DikDikConfig) {
+func Start(config *DikDikConfig) {
 
 	//initialize client
 	client, _ := dg.New("Bot " + config.Token)
-	//set variables
-	varbs := Variables1{
-		ourBool:    false,
-		sayoffTime: 5,
-	}
 
 	client.State.MaxMessageCount = 1000
 
@@ -52,8 +38,8 @@ func Start(config DikDikConfig) {
 	bot := Bot{
 		config:   config,
 		client:   client,
-		allVars:  varbs,
 		channels: make(map[string]*ChannelMap),
+		help:     buildEmbed(config),
 	}
 
 	//loads files
@@ -74,30 +60,26 @@ func Start(config DikDikConfig) {
 	client.AddHandler(bot.onDelete)
 }
 
-//embed for the help menu thing
-func (bot Bot) buildEmbed() dg.MessageEmbed {
-	embed := dg.MessageEmbed{}
-	//check to see if embed is already built
-	if bot.allVars.ourBool == false {
-		embed.Color = 0x1385ef
-		embed.Title = "Commands"
-		//only join when first creating
-		embed.Description = strings.Replace(
-			"`{prefix}talk channelName [message to send to channel]`\n"+
-				"Activate message sending to MentionedChannel. All messages you send hereafter will be send to this channel\n"+
-				"`{prefix}stop`\n"+
-				"Deactivate message sending to MentionChannel\n"+
-				"`{prefix}delete`\n"+
-				"Delete last sent message while say is active\n"+
-				"`{prefix}joke <optional channel>`\n"+
-				"Post a joke, or in a given channel\n"+
-				"`{prefix}facts <optional channel>`\n"+
-				"Post a fact, or in a given channel\n"+
-				"`{prefix}status`\n"+
-				"Confirm if say is currently active\n"+
-				"`{prefix}help`", "{prefix}", bot.config.Prefix, -1)
-		bot.allVars.ourBool = true
+func buildEmbed(config *DikDikConfig) *dg.MessageEmbed {
+	embed := &dg.MessageEmbed{
+		Color: 0x1385ef,
+		Title: "Commands",
 	}
+	//only join when first creating
+	embed.Description = strings.Replace(
+		"`{prefix}talk channelName [message to send to channel]`\n"+
+			"Control the bot to talk in another channel\n"+
+			"`{prefix}stop`\n"+
+			"Deactivate message sending to MentionChannel\n"+
+			"`{prefix}delete`\n"+
+			"Delete last sent message while say is active\n"+
+			"`{prefix}joke <optional channel>`\n"+
+			"Post a joke, or in a given channel\n"+
+			"`{prefix}facts <optional channel>`\n"+
+			"Post a fact, or in a given channel\n"+
+			"`{prefix}status`\n"+
+			"Confirm if say is currently active\n"+
+			"`{prefix}help`", "{prefix}", config.Prefix, -1)
 	return embed
 }
 
