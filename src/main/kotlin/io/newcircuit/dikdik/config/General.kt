@@ -9,7 +9,7 @@ data class General(
     var jokes: String,
     var facts: String,
 ) {
-    constructor() : this("", "", "", "")
+    constructor() : this("bot token here", "^", "default", "default")
 
     constructor(location: String = "config.yml") : this() {
         val config = getConfig(
