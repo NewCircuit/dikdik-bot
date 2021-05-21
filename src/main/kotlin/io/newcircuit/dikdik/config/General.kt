@@ -3,15 +3,15 @@ package io.newcircuit.dikdik.config
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class General(
+internal data class General(
     var token: String,
     var prefix: String,
     var jokes: String,
     var facts: String,
 ) {
-    constructor() : this("bot token here", "^", "default", "default")
+    constructor() : this("", "^", "$CONFIG_ROOT/jokes.yml", "$CONFIG_ROOT/facts.yml")
 
-    constructor(location: String = "config.yml") : this() {
+    constructor(location: String = "$CONFIG_ROOT/config.yml") : this() {
         val config = getConfig(
             location,
             ref = General(),

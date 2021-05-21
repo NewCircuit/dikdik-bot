@@ -3,7 +3,7 @@ package io.newcircuit.dikdik.config
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Quotes(var quotes: List<String>) {
+internal data class Quotes(var quotes: List<String>) {
     constructor() : this(ArrayList<String>())
 
     constructor(location: String) : this() {
@@ -15,9 +15,5 @@ data class Quotes(var quotes: List<String>) {
         )
 
         this.quotes = config.quotes
-    }
-
-    fun getRandom(): String {
-        return quotes.random()
     }
 }
