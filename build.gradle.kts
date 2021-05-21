@@ -1,12 +1,14 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+group = "io.newcircuit"
+version = "2.0.0"
+
 plugins {
     kotlin("jvm") version "1.5.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.5.0"
+    application
+    distribution
 }
-
-group = "io.newcircuit"
-version = "2.0.0"
 
 repositories {
     mavenCentral()
@@ -18,17 +20,20 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
     implementation("org.snakeyaml:snakeyaml-engine:2.3")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.5.0")
 }
 
-tasks.jar {
-    manifest {
-        attributes["Main-Class"] = "MainKt"
-    }
-    configurations["compileClasspath"].forEach { file: File ->
-        from(zipTree(file.absoluteFile))
-    }
+application {
+    mainClass.set("MainKt")
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "11"
+distributions {
+    main {
+        contents {
+            from("./config") {
+                into("config")
+            }
+            from("./README.md", "LICENSE")
+        }
+    }
 }
