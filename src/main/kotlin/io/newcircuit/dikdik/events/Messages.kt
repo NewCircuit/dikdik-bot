@@ -30,7 +30,9 @@ class Messages(private val bot: Bot) : MessageCreateListener {
     }
 
     private fun attemptRelay(msg: Message) {
-        if (msg.author.isBotUser) { return }
+        if (msg.author.isBotUser) {
+            return
+        }
         val channelMap = bot.channels[msg.author.id] ?: return
 
         if (msg.channel == channelMap.from) {

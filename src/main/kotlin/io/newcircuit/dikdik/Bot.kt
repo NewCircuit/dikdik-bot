@@ -1,7 +1,7 @@
 package io.newcircuit.dikdik
 
-import io.newcircuit.dikdik.commands.Quote
 import io.newcircuit.dikdik.commands.Help
+import io.newcircuit.dikdik.commands.Quote
 import io.newcircuit.dikdik.commands.Stop
 import io.newcircuit.dikdik.commands.TalkIn
 import io.newcircuit.dikdik.config.Config

@@ -18,7 +18,7 @@ data class CommandData(
 
             val name = if (noPrefix.contains(' ')) {
                 argsStr = noPrefix.substring(
-            noPrefix.indexOf(' ') + 1,
+                    noPrefix.indexOf(' ') + 1,
                 )
                 args = argsStr.split(' ')
                 noPrefix.substring(
