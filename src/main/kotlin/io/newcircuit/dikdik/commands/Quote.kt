@@ -13,8 +13,8 @@ class Quote(bot: Bot) : Command(
 ) {
     override fun run(cmd: CommandData): Boolean {
         val channels = cmd.msg.mentionedChannels
-        val target = if (channels.isNotEmpty()) {
-            cmd.msg.mentionedChannels[0]
+        val target = if (channels.isEmpty()) {
+            cmd.msg.channel
         } else {
             channels.first()
         }
