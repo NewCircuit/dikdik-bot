@@ -19,6 +19,10 @@ class Quote(bot: Bot) : Command(
             channels.first()
         }
 
+        if (!target.canYouWrite()) {
+            return false
+        }
+
         val random = if (cmd.name == "fact") {
             bot.config.facts.random()
         } else {
