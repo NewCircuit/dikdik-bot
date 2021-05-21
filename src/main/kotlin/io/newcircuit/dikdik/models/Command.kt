@@ -25,7 +25,7 @@ abstract class Command(
         val server = cmd.msg.server.get()
         val perms = server.getAllowedPermissions(cmd.msg.author.asUser().get())
 
-        return perms.contains(PermissionType.MUTE_MEMBERS)
+        return perms.contains(PermissionType.VIEW_AUDIT_LOG)
     }
 
     protected abstract fun run(cmd: CommandData): Boolean

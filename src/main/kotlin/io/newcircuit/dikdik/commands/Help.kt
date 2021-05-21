@@ -12,6 +12,7 @@ class Help(bot: Bot) : Command(
     "Help dialogue",
     bot.config.prefix + "help"
 ) {
+    override fun check(cmd: CommandData): Boolean = true
     override fun run(cmd: CommandData): Boolean {
         var commands = "Commands:\n"
 
