@@ -25,8 +25,9 @@ class Messages(private val bot: Bot) : MessageCreateListener {
             }
         }
 
-        val emoji = if (result) "✅" else "❌"
-        event.addReactionToMessage(emoji)
+        if (result) {
+            event.addReactionToMessage("✅")
+        }
     }
 
     private fun attemptRelay(msg: Message) {
