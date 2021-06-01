@@ -5,7 +5,7 @@ version = "2.0.0"
 
 plugins {
     kotlin("jvm") version "1.5.0"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.5.0"
+    kotlin("plugin.serialization") version "1.5.0"
     application
     distribution
 }
@@ -15,7 +15,9 @@ repositories {
 }
 
 dependencies {
-    implementation("org.javacord:javacord:3.3.0")
+    implementation(files(
+        "libs/javacord-3.3.1-SNAPSHOT-shaded.jar"
+    ))
     implementation("com.charleskorn.kaml:kaml:0.33.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
