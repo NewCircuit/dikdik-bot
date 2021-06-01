@@ -1,11 +1,10 @@
 package io.newcircuit.dikdik
 
-import io.newcircuit.dikdik.commands.Help
-import io.newcircuit.dikdik.commands.Quote
-import io.newcircuit.dikdik.commands.Stop
-import io.newcircuit.dikdik.commands.TalkIn
+import io.newcircuit.dikdik.commands.*
 import io.newcircuit.dikdik.config.Config
+import io.newcircuit.dikdik.events.Interactions
 import io.newcircuit.dikdik.events.Messages
+import io.newcircuit.dikdik.models.ButtonState
 import io.newcircuit.dikdik.models.ChannelMap
 import io.newcircuit.dikdik.models.Command
 import org.javacord.api.DiscordApi
@@ -16,6 +15,7 @@ import java.util.concurrent.CompletionException
 class Bot(val config: Config) {
     val commands = ArrayList<Command>()
     val channels = HashMap<Long, ChannelMap>()
+    val clicks = ButtonState.getState()
 
     init {
         this.registerCommands()
@@ -34,8 +34,10 @@ class Bot(val config: Config) {
         }
 
         val msgEvent = Messages(this)
+        val intEvent = Interactions(this)
 
         client.addListener(msgEvent)
+        client.addListener(intEvent)
     }
 
     private fun registerCommands() {
@@ -43,10 +45,12 @@ class Bot(val config: Config) {
         val quotes = Quote(this)
         val talkin = TalkIn(this)
         val stop = Stop(this)
+        val button = Button(this)
 
         commands.add(help)
         commands.add(quotes)
         commands.add(talkin)
         commands.add(stop)
+        commands.add(button)
     }
 }
