@@ -14,27 +14,25 @@ class TalkIn(bot: Bot) : Command(
     "Talk as the bot in another channel",
 ) {
     override fun run(interaction: Interaction, data: ApplicationCommandInteractionData): Pair<Boolean, String> {
-        val msg = interaction.message.get()
-        val channels = msg.mentionedChannels
-        if (channels.isEmpty()) {
-            return Pair(false, "Please provide a channel to talk in.")
-        }
+        val user = interaction.user
+        val channel = interaction.channel.get()
+        val target = getChannel(interaction, data)
+            ?: return Pair(false, "You're not able to talk in that channel.")
 
-        val channel = channels.first()
         val channelMap = ChannelMap(
-            msg.author.id,
+            user.id,
             channel,
-            msg.channel,
+            target,
         )
 
         if (!channel.canYouWrite()) {
-            return Pair(false, format("I'm not able to talk in %s", channel.mentionTag))
+            return Pair(false, format("I'm not able to talk in %s", target.mentionTag))
         }
 
-        bot.channels[msg.author.id] = channelMap
+        bot.channels[user.id] = channelMap
         InteractionMessageBuilder()
             .setFlags(MessageFlag.EPHEMERAL)
-            .setContent(format("Now transmitting messages to %s", channel.mentionTag))
+            .setContent(format("Now transmitting messages to %s", target.mentionTag))
             .sendInitialResponse(interaction)
             .join()
 

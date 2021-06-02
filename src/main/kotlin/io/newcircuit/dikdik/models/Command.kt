@@ -2,6 +2,7 @@ package io.newcircuit.dikdik.models
 
 import io.newcircuit.dikdik.Bot
 import org.javacord.api.entity.channel.ChannelType
+import org.javacord.api.entity.channel.ServerTextChannel
 import org.javacord.api.entity.channel.TextChannel
 import org.javacord.api.entity.message.Message
 import org.javacord.api.entity.permission.PermissionType
@@ -25,12 +26,12 @@ abstract class Command(
     }
 
     companion object {
-        fun getChannel(interaction: Interaction, data: ApplicationCommandInteractionData): TextChannel? {
+        fun getChannel(interaction: Interaction, data: ApplicationCommandInteractionData): ServerTextChannel? {
             if (data.options.size == 0) {
-                return interaction.channel.get()
+                return interaction.channel.get().asServerTextChannel().get()
             }
 
-            var result: TextChannel? = null
+            var result: ServerTextChannel? = null
             for (option in data.options) {
                 if (option.name != "channel") {
                     continue
