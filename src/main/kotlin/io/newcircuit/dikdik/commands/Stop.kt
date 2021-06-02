@@ -2,24 +2,34 @@ package io.newcircuit.dikdik.commands
 
 import io.newcircuit.dikdik.Bot
 import io.newcircuit.dikdik.models.Command
-import io.newcircuit.dikdik.models.CommandData
+import org.javacord.api.entity.message.InteractionMessageBuilder
+import org.javacord.api.entity.message.MessageBuilder
+import org.javacord.api.interaction.ApplicationCommandInteractionData
+import org.javacord.api.interaction.Interaction
 
 class Stop(bot: Bot) : Command(
     bot,
     "stop",
-    null,
     "Stop talking in a channel",
-    bot.config.prefix + "stop",
 ) {
-    override fun run(cmd: CommandData): Boolean {
-        val channelMap = bot.channels[cmd.msg.author.id]
+    override fun run(interaction: Interaction, data: ApplicationCommandInteractionData): Boolean {
+        val msg = interaction.message.get()
+        val channelMap = bot.channels[msg.author.id]
 
         if (channelMap == null) {
-            cmd.msg.reply("Not talking in any other channels")
+            InteractionMessageBuilder()
+                .setContent("Not talking in any other channels")
+                .sendFollowupMessage(interaction)
+                .join()
             return false
         }
 
-        bot.channels.remove(cmd.msg.author.id)
+        bot.channels.remove(msg.author.id)
+        InteractionMessageBuilder()
+            .setContent("Done.")
+            .sendInitialResponse(interaction)
+            .join()
+
         return true
     }
 }

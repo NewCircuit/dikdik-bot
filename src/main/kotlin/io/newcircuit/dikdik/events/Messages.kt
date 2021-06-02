@@ -1,7 +1,6 @@
 package io.newcircuit.dikdik.events
 
 import io.newcircuit.dikdik.Bot
-import io.newcircuit.dikdik.models.CommandData
 import org.javacord.api.entity.message.Message
 import org.javacord.api.event.message.MessageCreateEvent
 import org.javacord.api.listener.message.MessageCreateListener
@@ -9,24 +8,10 @@ import org.javacord.api.listener.message.MessageCreateListener
 class Messages(private val bot: Bot) : MessageCreateListener {
     override fun onMessageCreate(event: MessageCreateEvent) {
         val msg = event.message
-        var result = false
 
         if (!this.filter(msg)) {
             this.attemptRelay(msg)
             return
-        }
-
-        val cmd = CommandData.parse(bot.config.prefix, msg)
-
-        for (command in bot.commands) {
-            if (command.matches(cmd)) {
-                result = command.execute(cmd)
-                break
-            }
-        }
-
-        if (result) {
-            event.addReactionToMessage("✅")
         }
     }
 

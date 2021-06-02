@@ -3,37 +3,55 @@ package io.newcircuit.dikdik.commands
 import io.newcircuit.dikdik.Bot
 import io.newcircuit.dikdik.models.ChannelMap
 import io.newcircuit.dikdik.models.Command
-import io.newcircuit.dikdik.models.CommandData
+import org.javacord.api.entity.message.InteractionMessageBuilder
+import org.javacord.api.interaction.*
 import java.lang.String.format
 
 class TalkIn(bot: Bot) : Command(
     bot,
     "talkin",
-    null,
     "Talk as the bot in another channel",
-    bot.config.prefix + "talkin #channel",
 ) {
-    override fun run(cmd: CommandData): Boolean {
-        val channels = cmd.msg.mentionedChannels
+    override fun run(interaction: Interaction, data: ApplicationCommandInteractionData): Boolean {
+        val msg = interaction.message.get()
+        val channels = msg.mentionedChannels
         if (channels.isEmpty()) {
-            cmd.msg.reply("Please provide a channel to talk in.")
+            InteractionMessageBuilder()
+                .setContent("Please provide a channel to talk in.")
+                .sendFollowupMessage(interaction)
             return false
         }
+
         val channel = channels.first()
         val channelMap = ChannelMap(
-            cmd.msg.author.id,
+            msg.author.id,
             channel,
-            cmd.msg.channel,
+            msg.channel,
         )
 
         if (!channel.canYouWrite()) {
-            cmd.msg.reply(format("I'm not able to talk in %s", channel.mentionTag))
+            InteractionMessageBuilder()
+                .setContent(format("I'm not able to talk in %s", channel.mentionTag))
+                .sendFollowupMessage(interaction)
             return false
         }
 
-        bot.channels[cmd.msg.author.id] = channelMap
-        cmd.msg.reply(format("Now transmitting messages to %s", channel.mentionTag))
+        bot.channels[msg.author.id] = channelMap
+        InteractionMessageBuilder()
+            .setContent(format("Now transmitting messages to %s", channel.mentionTag))
+            .sendInitialResponse(interaction)
+            .join()
 
         return true
+    }
+
+    override fun getOptions(): ArrayList<ApplicationCommandOptionBuilder> {
+        return arrayListOf(
+            ApplicationCommandOptionBuilder()
+                .setName("channel")
+                .setDescription("The channel to talk in.")
+                .setType(ApplicationCommandOptionType.CHANNEL)
+                .setRequired(true)
+        )
     }
 }

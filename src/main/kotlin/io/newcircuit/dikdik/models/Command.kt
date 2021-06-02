@@ -1,44 +1,43 @@
 package io.newcircuit.dikdik.models
 
 import io.newcircuit.dikdik.Bot
+import org.javacord.api.entity.message.Message
 import org.javacord.api.entity.permission.PermissionType
+import org.javacord.api.entity.user.User
+import org.javacord.api.interaction.ApplicationCommandInteractionData
+import org.javacord.api.interaction.ApplicationCommandOptionBuilder
+import org.javacord.api.interaction.Interaction
 import java.lang.String.format
 
 abstract class Command(
     val bot: Bot,
     val name: String,
-    val alias: String? = null,
     val description: String,
-    val example: String,
 ) {
-    fun execute(cmd: CommandData): Boolean {
-        if (this.check(cmd)) {
-            return this.run(cmd)
+    fun execute(interaction: Interaction, data: ApplicationCommandInteractionData): Boolean {
+        if (this.check(interaction)) {
+            return this.run(interaction, data)
         }
         return false
     }
 
-    protected open fun check(cmd: CommandData): Boolean {
-        if (cmd.msg.server.isEmpty) {
-            return false
-        }
-        val server = cmd.msg.server.get()
-        val perms = server.getAllowedPermissions(cmd.msg.author.asUser().get())
+    open fun getOptions(): ArrayList<ApplicationCommandOptionBuilder> {
+        return ArrayList()
+    }
+
+    protected open fun check(interaction: Interaction): Boolean {
+        val serverOpt = interaction.server
+        val user = interaction.user
+        val server = if (serverOpt.isPresent) {
+            serverOpt.get()
+        } else {
+            null
+        }?: return false
+
+        val perms = server.getAllowedPermissions(user)
 
         return perms.contains(PermissionType.VIEW_AUDIT_LOG)
     }
 
-    protected abstract fun run(cmd: CommandData): Boolean
-
-    override fun toString(): String {
-        return if (alias == null)
-            format("%s: %s\n * `%s`", name, description, example)
-        else
-            format("%s or %s: %s\n * `%s`", name, alias, description, example)
-    }
-
-    fun matches(cmd: CommandData): Boolean {
-        return this.name == cmd.name
-                || this.alias == cmd.name
-    }
+    protected abstract fun run(interaction: Interaction, data: ApplicationCommandInteractionData): Boolean
 }

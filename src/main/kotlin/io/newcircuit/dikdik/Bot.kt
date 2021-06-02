@@ -9,30 +9,26 @@ import io.newcircuit.dikdik.models.ChannelMap
 import io.newcircuit.dikdik.models.Command
 import org.javacord.api.DiscordApi
 import org.javacord.api.DiscordApiBuilder
-import java.util.concurrent.CompletionException
+import org.javacord.api.interaction.ApplicationCommand
+import org.javacord.api.interaction.ApplicationCommandBuilder
+import java.util.concurrent.CompletableFuture
 
 
 class Bot(val config: Config) {
+    private val client: DiscordApi = DiscordApiBuilder()
+        .setToken(config.token)
+        .login().join()
     val commands = ArrayList<Command>()
     val channels = HashMap<Long, ChannelMap>()
     val clicks = ButtonState.getState()
 
-    init {
-        this.registerCommands()
+    fun start() {
+        registerEventListeners()
+        registerCommands()
+        println("Ready")
     }
 
-    fun start() {
-        val client: DiscordApi
-
-        try {
-            client = DiscordApiBuilder()
-                .setToken(config.token)
-                .login().join()
-        } catch (_: CompletionException) {
-            println("Failed to login, is the token correct?")
-            return
-        }
-
+    private fun registerEventListeners() {
         val msgEvent = Messages(this)
         val intEvent = Interactions(this)
 
@@ -41,16 +37,26 @@ class Bot(val config: Config) {
     }
 
     private fun registerCommands() {
-        val help = Help(this)
-        val quotes = Quote(this)
-        val talkin = TalkIn(this)
-        val stop = Stop(this)
-        val button = Button(this)
+        val server = client.getServerById(718433475828645928).get()
+        val cmds = arrayListOf(
+            Joke(this),
+            Fact(this),
+            TalkIn(this),
+            Stop(this),
+            Button(this),
+        )
 
-        commands.add(help)
-        commands.add(quotes)
-        commands.add(talkin)
-        commands.add(stop)
-        commands.add(button)
+        for (command in cmds) {
+            val builder = ApplicationCommandBuilder()
+                .setName(command.name)
+                .setDescription(command.description)
+            val options = command.getOptions()
+            for (option in options) {
+                builder.addOption(option.build())
+            }
+            println("Registering: ${command.name}")
+            builder.createForServer(server).join()
+            this.commands.add(command)
+        }
     }
 }
