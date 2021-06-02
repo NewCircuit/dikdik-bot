@@ -30,6 +30,7 @@ class TalkIn(bot: Bot) : Command(
         }
 
         bot.channels[user.id] = channelMap
+
         InteractionMessageBuilder()
             .setFlags(MessageFlag.EPHEMERAL)
             .setContent(format("Now transmitting messages to %s", target.mentionTag))

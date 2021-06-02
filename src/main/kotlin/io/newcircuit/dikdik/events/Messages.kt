@@ -9,12 +9,6 @@ class Messages(private val bot: Bot) : MessageCreateListener {
     override fun onMessageCreate(event: MessageCreateEvent) {
         val msg = event.message
 
-        if (this.filter(msg)) {
-            this.attemptRelay(msg)
-        }
-    }
-
-    private fun attemptRelay(msg: Message) {
         if (msg.author.isBotUser) {
             return
         }
@@ -22,11 +16,7 @@ class Messages(private val bot: Bot) : MessageCreateListener {
 
         if (msg.channel == channelMap.from) {
             msg.toMessageBuilder().send(channelMap.to)
-            msg.addReaction("✉️")
+                .thenRun { -> msg.addReaction("✉️").join() }
         }
-    }
-
-    private fun filter(msg: Message): Boolean {
-        return !msg.author.isBotUser
     }
 }
