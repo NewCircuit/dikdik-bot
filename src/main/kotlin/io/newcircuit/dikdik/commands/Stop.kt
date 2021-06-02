@@ -14,11 +14,11 @@ class Stop(bot: Bot) : Command(
     "Stop talking in a channel",
 ) {
     override fun run(interaction: Interaction, data: ApplicationCommandInteractionData): Pair<Boolean, String> {
-        val msg = interaction.message.get()
-        val channelMap = bot.channels[msg.author.id]
-            ?: return Pair(false, "Not talking in any other channels")
+        val user = interaction.user
 
-        bot.channels.remove(msg.author.id)
+        bot.channels[user.id] ?: return Pair(false, "Not talking in any other channels")
+        bot.channels.remove(user.id)
+
         InteractionMessageBuilder()
             .setContent("Done.")
             .setFlags(MessageFlag.EPHEMERAL)

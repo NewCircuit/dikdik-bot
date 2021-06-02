@@ -1,6 +1,5 @@
 # User bot token
 token: ""
-prefix: "^"
 # You can create your own facts and jokes by creating a yml file with a "quotes" property with
 # a list of strings and then providing a path to that file here.
 facts: 'default'
