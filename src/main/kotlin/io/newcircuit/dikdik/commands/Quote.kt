@@ -1,6 +1,8 @@
 package io.newcircuit.dikdik.commands
 
 import io.newcircuit.dikdik.Bot
+import io.newcircuit.dikdik.models.Command
+import org.javacord.api.entity.channel.ChannelType
 import org.javacord.api.entity.message.InteractionMessageBuilder
 import org.javacord.api.entity.message.MessageFlag
 import org.javacord.api.interaction.ApplicationCommandInteractionData
@@ -10,14 +12,8 @@ import org.javacord.api.interaction.Interaction
 
 class Quote(private val bot: Bot) {
     fun run(interaction: Interaction, data: ApplicationCommandInteractionData, opt: String): Pair<Boolean, String> {
-        val target = if (data.options.size == 0) {
-            interaction.channel.get()
-        } else {
-            val api = interaction.api
-            val option = data.options[0]
-            val id = option.stringValue.get().toLong()
-            api.getTextChannelById(id).get()
-        }
+        val target = Command.getChannel(interaction, data)
+            ?: return Pair(false, "Please provide a text-channel.")
 
         if (!target.canYouWrite()) {
             return Pair(false, "I can't send messages in that channel.")
@@ -43,7 +39,7 @@ class Quote(private val bot: Bot) {
         return arrayListOf(
             ApplicationCommandOptionBuilder()
                 .setName("channel")
-                .setDescription("Optionally send this joke or fact to a channel.")
+                .setDescription("Optionally send this joke or fact to a text-channel.")
                 .setType(ApplicationCommandOptionType.CHANNEL)
                 .setRequired(false)
         )
