@@ -14,34 +14,35 @@ abstract class Command(
     val name: String,
     val description: String,
 ) {
-    fun execute(interaction: Interaction, data: ApplicationCommandInteractionData): Boolean {
-        if (this.check(interaction)) {
+    fun execute(interaction: Interaction, data: ApplicationCommandInteractionData): Pair<Boolean, String> {
+        val (check, reason) = this.check(interaction)
+        if (check) {
             return this.run(interaction, data)
         }
-        return false
+        return Pair(check, reason)
     }
 
     open fun getOptions(): ArrayList<ApplicationCommandOptionBuilder> {
         return ArrayList()
     }
 
-    protected open fun check(interaction: Interaction): Boolean {
+    protected open fun check(interaction: Interaction): Pair<Boolean, String> {
         val serverOpt = interaction.server
         val user = interaction.user
         val server = if (serverOpt.isPresent) {
             serverOpt.get()
         } else {
             null
-        }?: return false
+        }?: return Pair(false, "This is a guild-only command.")
 
         for (role in server.getRoles(user)) {
             if (bot.config.whitelist.contains(role.id)) {
-                return true
+                return Pair(true, "")
             }
         }
 
-        return false
+        return Pair(false, "You don't have permission to run this command.")
     }
 
-    protected abstract fun run(interaction: Interaction, data: ApplicationCommandInteractionData): Boolean
+    protected abstract fun run(interaction: Interaction, data: ApplicationCommandInteractionData): Pair<Boolean, String>
 }

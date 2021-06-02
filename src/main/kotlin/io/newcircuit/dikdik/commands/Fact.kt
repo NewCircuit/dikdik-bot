@@ -16,7 +16,7 @@ class Fact(bot: Bot) : Command(
 ) {
     private val quote = Quote(bot)
 
-    override fun run(interaction: Interaction, data: ApplicationCommandInteractionData): Boolean {
+    override fun run(interaction: Interaction, data: ApplicationCommandInteractionData): Pair<Boolean, String> {
         return quote.run(interaction, data, "fact")
     }
 

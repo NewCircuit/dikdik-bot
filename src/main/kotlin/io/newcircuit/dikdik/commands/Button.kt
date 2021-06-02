@@ -13,7 +13,7 @@ class Button(bot: Bot) : Command(
     "button",
     "Spawn a counter button",
 ) {
-    override fun run(interaction: Interaction, data: ApplicationCommandInteractionData): Boolean {
+    override fun run(interaction: Interaction, data: ApplicationCommandInteractionData): Pair<Boolean, String> {
         val server = interaction.server.get()
         val serverId = server.id
 
@@ -27,6 +27,6 @@ class Button(bot: Bot) : Command(
             .sendInitialResponse(interaction)
             .join()
 
-        return true
+        return Pair(true, "")
     }
 }

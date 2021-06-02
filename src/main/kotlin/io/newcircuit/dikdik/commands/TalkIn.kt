@@ -4,6 +4,7 @@ import io.newcircuit.dikdik.Bot
 import io.newcircuit.dikdik.models.ChannelMap
 import io.newcircuit.dikdik.models.Command
 import org.javacord.api.entity.message.InteractionMessageBuilder
+import org.javacord.api.entity.message.MessageFlag
 import org.javacord.api.interaction.*
 import java.lang.String.format
 
@@ -12,14 +13,11 @@ class TalkIn(bot: Bot) : Command(
     "talkin",
     "Talk as the bot in another channel",
 ) {
-    override fun run(interaction: Interaction, data: ApplicationCommandInteractionData): Boolean {
+    override fun run(interaction: Interaction, data: ApplicationCommandInteractionData): Pair<Boolean, String> {
         val msg = interaction.message.get()
         val channels = msg.mentionedChannels
         if (channels.isEmpty()) {
-            InteractionMessageBuilder()
-                .setContent("Please provide a channel to talk in.")
-                .sendFollowupMessage(interaction)
-            return false
+            return Pair(false, "Please provide a channel to talk in.")
         }
 
         val channel = channels.first()
@@ -30,19 +28,17 @@ class TalkIn(bot: Bot) : Command(
         )
 
         if (!channel.canYouWrite()) {
-            InteractionMessageBuilder()
-                .setContent(format("I'm not able to talk in %s", channel.mentionTag))
-                .sendFollowupMessage(interaction)
-            return false
+            return Pair(false, format("I'm not able to talk in %s", channel.mentionTag))
         }
 
         bot.channels[msg.author.id] = channelMap
         InteractionMessageBuilder()
+            .setFlags(MessageFlag.EPHEMERAL)
             .setContent(format("Now transmitting messages to %s", channel.mentionTag))
             .sendInitialResponse(interaction)
             .join()
 
-        return true
+        return Pair(true, "")
     }
 
     override fun getOptions(): ArrayList<ApplicationCommandOptionBuilder> {

@@ -1,6 +1,7 @@
 package io.newcircuit.dikdik.events
 
 import io.newcircuit.dikdik.Bot
+import org.javacord.api.entity.message.MessageFlag
 import org.javacord.api.entity.message.component.*
 import org.javacord.api.event.interaction.InteractionCreateEvent
 import org.javacord.api.interaction.ApplicationCommandInteractionData
@@ -27,12 +28,21 @@ class Interactions(private val bot: Bot) : InteractionCreateListener {
     }
 
     private fun onCommandEvent(event: InteractionCreateEvent, data: ApplicationCommandInteractionData) {
-        println(event.interaction.user.name)
-        println("Found: ${bot.commands.size}")
+        var result: Pair<Boolean, String> = Pair(false, "Command not found.")
         for (command in bot.commands) {
             if (command.name == data.name) {
-                command.execute(event.interaction, data)
+                result = command.execute(event.interaction, data)
+                break
             }
+        }
+        val (res, reason) = result
+
+        if (!res) {
+            event.respond()
+                .setFlags(MessageFlag.EPHEMERAL)
+                .setContent(reason)
+                .sendInitialResponse(event.interaction)
+                .join()
         }
     }
 

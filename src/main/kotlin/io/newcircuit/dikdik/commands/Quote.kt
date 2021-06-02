@@ -9,7 +9,7 @@ import org.javacord.api.interaction.ApplicationCommandOptionType
 import org.javacord.api.interaction.Interaction
 
 class Quote(private val bot: Bot) {
-    fun run(interaction: Interaction, data: ApplicationCommandInteractionData, opt: String): Boolean {
+    fun run(interaction: Interaction, data: ApplicationCommandInteractionData, opt: String): Pair<Boolean, String> {
         val target = if (data.options.size == 0) {
             interaction.channel.get()
         } else {
@@ -20,7 +20,7 @@ class Quote(private val bot: Bot) {
         }
 
         if (!target.canYouWrite()) {
-            return false
+            return Pair(false, "I can't send messages in that channel.")
         }
 
         val random = if (opt == "joke")
@@ -36,7 +36,7 @@ class Quote(private val bot: Bot) {
 
         target.sendMessage(random).join()
 
-        return true
+        return Pair(true, "")
     }
 
     fun getOptions(): ArrayList<ApplicationCommandOptionBuilder> {
