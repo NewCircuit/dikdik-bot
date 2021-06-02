@@ -34,9 +34,13 @@ abstract class Command(
             null
         }?: return false
 
-        val perms = server.getAllowedPermissions(user)
+        for (role in server.getRoles(user)) {
+            if (bot.config.whitelist.contains(role.id)) {
+                return true
+            }
+        }
 
-        return perms.contains(PermissionType.VIEW_AUDIT_LOG)
+        return false
     }
 
     protected abstract fun run(interaction: Interaction, data: ApplicationCommandInteractionData): Boolean

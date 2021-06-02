@@ -5,3 +5,5 @@ prefix: "^"
 # a list of strings and then providing a path to that file here.
 facts: 'default'
 jokes: 'default'
+# A list of role IDs
+whitelist: []
