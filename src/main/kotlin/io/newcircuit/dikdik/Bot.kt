@@ -55,7 +55,7 @@ class Bot(val config: Config) {
                 builder.addOption(option.build())
             }
             println("Registering: ${command.name}")
-            builder.createForServer(server).join()
+            builder.createGlobal(client).join()
             this.commands.add(command)
         }
     }
