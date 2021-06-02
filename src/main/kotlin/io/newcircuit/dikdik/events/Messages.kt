@@ -9,9 +9,8 @@ class Messages(private val bot: Bot) : MessageCreateListener {
     override fun onMessageCreate(event: MessageCreateEvent) {
         val msg = event.message
 
-        if (!this.filter(msg)) {
+        if (this.filter(msg)) {
             this.attemptRelay(msg)
-            return
         }
     }
 
@@ -29,6 +28,5 @@ class Messages(private val bot: Bot) : MessageCreateListener {
 
     private fun filter(msg: Message): Boolean {
         return !msg.author.isBotUser
-                && msg.content.startsWith(bot.config.prefix)
     }
 }
