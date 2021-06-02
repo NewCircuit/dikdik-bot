@@ -21,15 +21,7 @@ class Button(bot: Bot) : Command(
             ?: return Pair(false, "Please provide a text-channel.")
         val server = interaction.server.get()
         val serverId = server.id
-
         val button = bot.clicks.getButton(serverId)
-        val res = InteractionMessageBuilder()
-            .setFlags(MessageFlag.EPHEMERAL)
-            .setContent("Sent.")
-            .sendInitialResponse(interaction)
-            .join()
-            .deleteInitialResponse(interaction)
-            .join()
 
         MessageBuilder()
             .setContent("Click Me!")
@@ -38,6 +30,12 @@ class Button(bot: Bot) : Command(
                     .addComponent(button)
             )
             .send(target)
+            .join()
+
+        InteractionMessageBuilder()
+            .setFlags(MessageFlag.EPHEMERAL)
+            .setContent("Sent.")
+            .sendInitialResponse(interaction)
             .join()
 
         return Pair(true, "")
