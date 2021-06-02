@@ -30,6 +30,7 @@ abstract class Command(
                 return interaction.channel.get()
             }
 
+            var result: TextChannel? = null
             for (option in data.options) {
                 if (option.name != "channel") {
                     continue
@@ -42,10 +43,17 @@ abstract class Command(
                     return null
                 }
 
-                return channel.asServerTextChannel().get()
+                result = channel.asServerTextChannel().get()
+                break
             }
 
-            return null
+            result?: return null
+
+            return if (result.canWrite(interaction.user)) {
+                result
+            } else {
+                null
+            }
         }
     }
 
