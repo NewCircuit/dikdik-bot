@@ -24,13 +24,15 @@ class Quote(private val bot: Bot) {
         else
             bot.config.facts.random()
 
-        InteractionMessageBuilder()
-            .setContent("Sent.")
-            .sendInitialResponse(interaction)
-            .join()
-            .deleteInitialResponse(interaction)
+        val builder = InteractionMessageBuilder()
+        if (target == interaction.channel.get()) {
+            builder.setContent(random)
+        } else {
+            builder.setContent("Sent.")
+            target.sendMessage(random).join()
+        }
+        builder.sendInitialResponse(interaction)
 
-        target.sendMessage(random).join()
 
         return Pair(true, "")
     }
