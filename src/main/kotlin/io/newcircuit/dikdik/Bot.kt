@@ -46,7 +46,19 @@ class Bot(val config: Config) {
             TalkIn(this),
             Stop(this),
             Button(this),
+            Ask(this),
+            CloseVote(this),
         )
+
+        val globalCmds = client.globalApplicationCommands.join()
+        val hasCmd = fun(name: String): Boolean {
+            for (cmd in globalCmds) {
+                if (cmd.name == name) {
+                    return true
+                }
+            }
+            return false
+        }
 
         for (command in cmds) {
             val builder = ApplicationCommandBuilder()
@@ -57,8 +69,10 @@ class Bot(val config: Config) {
                 builder.addOption(option.build())
             }
             println("Registering: ${command.name}")
+            if (!hasCmd(command.name)) {
+                builder.createForServer(testServer).join()
+            }
             builder.createGlobal(client).join()
-            builder.createForServer(testServer).join()
             this.commands.add(command)
         }
     }
