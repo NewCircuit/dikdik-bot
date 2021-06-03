@@ -39,7 +39,7 @@ class Bot(val config: Config) {
     }
 
     private fun registerCommands() {
-        val server = client.getServerById(718433475828645928).get()
+        val testServer = client.getServerById(718433475828645928).get()
         val cmds = arrayListOf(
             Joke(this),
             Fact(this),
@@ -58,6 +58,7 @@ class Bot(val config: Config) {
             }
             println("Registering: ${command.name}")
             builder.createGlobal(client).join()
+            builder.createForServer(testServer).join()
             this.commands.add(command)
         }
     }
