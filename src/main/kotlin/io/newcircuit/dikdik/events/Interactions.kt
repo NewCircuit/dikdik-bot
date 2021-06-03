@@ -2,10 +2,8 @@ package io.newcircuit.dikdik.events
 
 import io.newcircuit.dikdik.Bot
 import org.javacord.api.entity.message.MessageFlag
-import org.javacord.api.entity.message.component.*
 import org.javacord.api.event.interaction.InteractionCreateEvent
 import org.javacord.api.interaction.ApplicationCommandInteractionData
-import org.javacord.api.interaction.Interaction
 import org.javacord.api.interaction.InteractionComponentData
 import org.javacord.api.listener.interaction.InteractionCreateListener
 
@@ -23,7 +21,9 @@ class Interactions(private val bot: Bot) : InteractionCreateListener {
     }
     private fun onComponentEvent(event: InteractionCreateEvent, data: InteractionComponentData) {
         if (data.customId == "click_counter") {
-            this.onButtonClick(event)
+            this.onButtonClicker(event)
+        } else if (data.customId.startsWith("vote")) {
+            this.onVote(event, data)
         }
     }
 
@@ -46,7 +46,18 @@ class Interactions(private val bot: Bot) : InteractionCreateListener {
         }
     }
 
-    private fun onButtonClick(event: InteractionCreateEvent) {
+    private fun onVote(event: InteractionCreateEvent, data: InteractionComponentData) {
+        val interaction = event.interaction
+        val isYes = data.customId == "vote_yes"
+        val vote = bot.votes[interaction.id]?: return
+
+        vote.addVote(
+            interaction.user.id,
+            isYes,
+        )
+    }
+
+    private fun onButtonClicker(event: InteractionCreateEvent) {
         val interaction = event.interaction
         val msg = interaction.message.get()
         val user = interaction.user

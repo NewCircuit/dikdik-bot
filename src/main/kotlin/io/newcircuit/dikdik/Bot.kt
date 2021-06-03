@@ -7,6 +7,7 @@ import io.newcircuit.dikdik.events.Messages
 import io.newcircuit.dikdik.models.ButtonState
 import io.newcircuit.dikdik.models.ChannelMap
 import io.newcircuit.dikdik.models.Command
+import io.newcircuit.dikdik.models.Question
 import org.javacord.api.DiscordApi
 import org.javacord.api.DiscordApiBuilder
 import org.javacord.api.interaction.ApplicationCommand
@@ -21,6 +22,7 @@ class Bot(val config: Config) {
     val commands = ArrayList<Command>()
     val channels = HashMap<Long, ChannelMap>()
     val clicks = ButtonState.getState()
+    val votes = HashMap<Long, Question>()
 
     fun start() {
         registerEventListeners()
