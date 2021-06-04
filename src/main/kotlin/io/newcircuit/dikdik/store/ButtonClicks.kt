@@ -13,9 +13,9 @@ class ButtonClicks(
     private val clicks: HashMap<Long, Int> = HashMap(),
 ) : Store<ButtonClicks>("./config/clicks.json") {
 
-    fun getButton(serverId: Long): ButtonBuilder = runBlocking {
+    fun getButton(serverId: Long): ButtonBuilder {
         val clicks = getClicks(serverId)
-        return@runBlocking ButtonBuilder()
+        return ButtonBuilder()
             .setCustomId("click_counter")
             .setStyle(ButtonStyle.PRIMARY)
             .setLabel("Clicks: $clicks")
