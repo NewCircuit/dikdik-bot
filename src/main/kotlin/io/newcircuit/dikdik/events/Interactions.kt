@@ -49,9 +49,11 @@ class Interactions(private val bot: Bot) : InteractionCreateListener {
     private fun onVote(event: InteractionCreateEvent, data: InteractionComponentData) {
         val interaction = event.interaction
         val isYes = data.customId == "vote_yes"
-        val vote = bot.votes[interaction.id]?: return
+        val voteId = interaction.channel.get().id
+        val vote = bot.votes[voteId]?: return
 
         vote.addVote(
+            event.interaction,
             interaction.user.id,
             isYes,
         )

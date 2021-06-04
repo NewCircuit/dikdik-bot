@@ -21,19 +21,19 @@ class Ask(bot: Bot): Command(
         }?: return Pair(false, "Please provide a question")
 
         val questionStr = option.stringValue.get()
-        val question = Question(
+        val newVote = Question(
             interaction,
             questionStr,
         )
 
         for (vote in bot.votes.values) {
-            if (vote.author == question.author) {
-                return Pair(false, "You already have an active vote.")
+            if (vote.id == newVote.id) {
+                return Pair(false, "There's already an active vote in this channel.")
             }
         }
 
-        bot.votes[interaction.id] = question
-        val msg = question.getIBuilder()
+        bot.votes[newVote.id] = newVote
+        val msg = newVote.getIBuilder()
         msg.sendInitialResponse(interaction).join()
 
         return Pair(true, "")

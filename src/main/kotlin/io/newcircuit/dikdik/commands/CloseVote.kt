@@ -12,24 +12,15 @@ class CloseVote(bot: Bot) : Command(
     "Close your last vote.",
 ) {
     override fun run(interaction: Interaction, data: ApplicationCommandInteractionData): Pair<Boolean, String> {
-        var closed = false
-        val userId = interaction.user.id
-        for (vote in bot.votes.values) {
-            if (vote.author == userId) {
-                vote.close()
-                bot.votes.remove(vote.id)
-                closed = true
-            }
-        }
+        val voteId = interaction.channel.get().id
+        val vote = bot.votes[voteId]?: return Pair(false, "There are no active votes in this channel.")
+        vote.close()
+        bot.votes.remove(vote.id)
 
-        return if (closed) {
-            InteractionMessageBuilder()
-                .setContent("Vote closed.")
-                .sendInitialResponse(interaction)
-                .join()
-            Pair(true, "")
-        } else {
-            Pair(false, "You don't have an active vote.")
-        }
+        InteractionMessageBuilder()
+            .setContent("Vote closed.")
+            .sendInitialResponse(interaction)
+            .join()
+        return Pair(true, "")
     }
 }

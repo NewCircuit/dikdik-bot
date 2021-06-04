@@ -10,19 +10,18 @@ class Question(
     val interaction: Interaction,
     val message: String,
 ) {
-    val id = interaction.id
-    val author = interaction.user.id
+    val id = interaction.channel.get().id
     private val votes: ArrayList<Vote> = ArrayList()
 
-    fun addVote(userId: Long, isYes: Boolean) {
+    fun addVote(interaction: Interaction, userId: Long, isYes: Boolean) {
         val newVote = Vote(userId, isYes)
 
         for (vote in votes) {
             if (vote.userId == userId) {
                 votes.remove(vote)
                 // this means they're removing their vote
-                if (vote.isYes == vote.isYes || vote.isNo == vote.isNo) {
-                    update()
+                if (newVote.isYes == vote.isYes) {
+                    update(interaction)
                     return
                 }
                 break
@@ -30,13 +29,20 @@ class Question(
         }
 
         votes.add(newVote)
-        update()
+        update(interaction)
     }
 
     fun close() {
         val iBuilder = getIBuilder(true)
+        val (yes, no) = countVotes()
+        val finalSay = if (yes > no) {
+            "**vote passed!**"
+        } else {
+            "**vote failed!**"
+        }
 
-        iBuilder.editOriginalResponse(interaction)
+        iBuilder.setContent("$message ($finalSay)")
+            .editOriginalResponse(interaction)
             .join()
     }
 
@@ -47,10 +53,10 @@ class Question(
             .addComponent(components)
     }
 
-    fun update() {
+    fun update(interaction: Interaction) {
         val iBuilder = getIBuilder()
 
-        iBuilder.editOriginalResponse(interaction).join()
+        iBuilder.update(interaction).join()
     }
 
     private fun countVotes(): Pair<Int, Int> {
@@ -81,7 +87,7 @@ class Question(
             .addComponent(
                 ButtonBuilder()
                     .setLabel("No: $no")
-                    .setCustomId("vote_yes")
+                    .setCustomId("vote_no")
                     .setDisabled(toDisable)
                     .setStyle(ButtonStyle.DANGER)
             )
