@@ -17,37 +17,19 @@ class Button(bot: Bot) : Command(
     "Spawn a counter button",
 ) {
     override fun run(interaction: Interaction, data: ApplicationCommandInteractionData): Pair<Boolean, String> {
-        val target = getChannel(interaction, data)
-            ?: return Pair(false, "Please provide a text-channel.")
         val server = interaction.server.get()
         val serverId = server.id
         val button = bot.clicks.getButton(serverId)
 
-        MessageBuilder()
+        InteractionMessageBuilder()
             .setContent("Click Me!")
             .addComponent(
                 ActionRowBuilder()
                     .addComponent(button)
             )
-            .send(target)
-            .join()
-
-        InteractionMessageBuilder()
-            .setFlags(MessageFlag.EPHEMERAL)
-            .setContent("Sent.")
             .sendInitialResponse(interaction)
             .join()
 
         return Pair(true, "")
-    }
-
-    override fun getOptions(): ArrayList<ApplicationCommandOptionBuilder> {
-        return arrayListOf(
-            ApplicationCommandOptionBuilder()
-                .setName("channel")
-                .setDescription("Optionally send this button to a text-channel.")
-                .setType(ApplicationCommandOptionType.CHANNEL)
-                .setRequired(false)
-        )
     }
 }
