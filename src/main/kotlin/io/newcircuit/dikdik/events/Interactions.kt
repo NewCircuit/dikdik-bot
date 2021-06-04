@@ -8,8 +8,6 @@ import org.javacord.api.interaction.InteractionComponentData
 import org.javacord.api.listener.interaction.InteractionCreateListener
 
 class Interactions(private val bot: Bot) : InteractionCreateListener {
-    private val clickManager = bot.clicks
-
     override fun onInteractionCreate(eventOpt: InteractionCreateEvent?) {
         eventOpt?: return
 
@@ -19,7 +17,10 @@ class Interactions(private val bot: Bot) : InteractionCreateListener {
             this.onCommandEvent(eventOpt, eventOpt.interaction.commandData.get())
         }
     }
-    private fun onComponentEvent(event: InteractionCreateEvent, data: InteractionComponentData) {
+    private fun onComponentEvent(
+        event: InteractionCreateEvent,
+        data: InteractionComponentData,
+    ) {
         if (data.customId == "click_counter") {
             this.onButtonClicker(event)
         } else if (data.customId.startsWith("vote")) {
@@ -27,7 +28,10 @@ class Interactions(private val bot: Bot) : InteractionCreateListener {
         }
     }
 
-    private fun onCommandEvent(event: InteractionCreateEvent, data: ApplicationCommandInteractionData) {
+    private fun onCommandEvent(
+        event: InteractionCreateEvent,
+        data: ApplicationCommandInteractionData,
+    ) {
         var result: Pair<Boolean, String> = Pair(false, "Command not found.")
         for (command in bot.commands) {
             if (command.name == data.name) {
@@ -46,13 +50,16 @@ class Interactions(private val bot: Bot) : InteractionCreateListener {
         }
     }
 
-    private fun onVote(event: InteractionCreateEvent, data: InteractionComponentData) {
+    private fun onVote(
+        event: InteractionCreateEvent,
+        data: InteractionComponentData,
+    ) {
         val interaction = event.interaction
         val isYes = data.customId == "vote_yes"
         val voteId = interaction.channel.get().id
-        val vote = bot.votes[voteId]?: return
+        val vote = bot.store.votes.get(voteId)?: return
 
-        vote.addVote(
+        vote.addEntry(
             event.interaction,
             interaction.user.id,
             isYes,
@@ -64,7 +71,7 @@ class Interactions(private val bot: Bot) : InteractionCreateListener {
         val msg = interaction.message.get()
         val user = interaction.user
         val server = msg.server.get()
-        val button = clickManager.getClickedButton(msg)
+        val button = bot.store.clicks.getClickedButton(msg)
 
         event.updateComponentMessage()
             .copy(msg)

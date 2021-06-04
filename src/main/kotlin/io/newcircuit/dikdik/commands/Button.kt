@@ -3,12 +3,8 @@ package io.newcircuit.dikdik.commands
 import io.newcircuit.dikdik.Bot
 import io.newcircuit.dikdik.models.Command
 import org.javacord.api.entity.message.InteractionMessageBuilder
-import org.javacord.api.entity.message.MessageBuilder
-import org.javacord.api.entity.message.MessageFlag
 import org.javacord.api.entity.message.component.ActionRowBuilder
 import org.javacord.api.interaction.ApplicationCommandInteractionData
-import org.javacord.api.interaction.ApplicationCommandOptionBuilder
-import org.javacord.api.interaction.ApplicationCommandOptionType
 import org.javacord.api.interaction.Interaction
 
 class Button(bot: Bot) : Command(
@@ -19,7 +15,7 @@ class Button(bot: Bot) : Command(
     override fun run(interaction: Interaction, data: ApplicationCommandInteractionData): Pair<Boolean, String> {
         val server = interaction.server.get()
         val serverId = server.id
-        val button = bot.clicks.getButton(serverId)
+        val button = bot.store.clicks.getButton(serverId)
 
         InteractionMessageBuilder()
             .setContent("Click Me!")

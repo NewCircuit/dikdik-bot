@@ -1,11 +1,13 @@
 package io.newcircuit.dikdik.commands
 
 import io.newcircuit.dikdik.Bot
-import io.newcircuit.dikdik.models.ChannelMap
 import io.newcircuit.dikdik.models.Command
 import org.javacord.api.entity.message.InteractionMessageBuilder
 import org.javacord.api.entity.message.MessageFlag
-import org.javacord.api.interaction.*
+import org.javacord.api.interaction.ApplicationCommandInteractionData
+import org.javacord.api.interaction.ApplicationCommandOptionBuilder
+import org.javacord.api.interaction.ApplicationCommandOptionType
+import org.javacord.api.interaction.Interaction
 import java.lang.String.format
 
 class TalkIn(bot: Bot) : Command(
@@ -13,29 +15,33 @@ class TalkIn(bot: Bot) : Command(
     "talkin",
     "Talk as the bot in another channel",
 ) {
-    override fun run(interaction: Interaction, data: ApplicationCommandInteractionData): Pair<Boolean, String> {
+    override fun run(
+        interaction: Interaction,
+        data: ApplicationCommandInteractionData,
+    ): Pair<Boolean, String> {
         val user = interaction.user
         val channel = interaction.channel.get()
         val target = getChannel(interaction, data)
             ?: return Pair(false, "You're not able to talk in that channel.")
 
-        val channelMap = ChannelMap(
+        bot.store.channels.create(
             user.id,
-            channel,
-            target,
+            channel.id,
+            target.id,
         )
 
         if (!channel.canYouWrite()) {
-            return Pair(false, format("I'm not able to talk in %s", target.mentionTag))
+            return Pair(
+                false,
+                format("I'm not able to talk in %s", target.mentionTag),
+            )
         }
-
-        bot.channels[user.id] = channelMap
 
         InteractionMessageBuilder()
             .setFlags(MessageFlag.EPHEMERAL)
-            .setContent(format("Now transmitting messages to %s", target.mentionTag))
-            .sendInitialResponse(interaction)
-            .join()
+            .setContent(
+                format("Now transmitting messages to %s", target.mentionTag),
+            ).sendInitialResponse(interaction).join()
 
         return Pair(true, "")
     }

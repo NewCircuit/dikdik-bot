@@ -2,9 +2,6 @@ package io.newcircuit.dikdik.commands
 
 import io.newcircuit.dikdik.Bot
 import org.javacord.api.entity.message.InteractionMessageBuilder
-import org.javacord.api.interaction.ApplicationCommandInteractionData
-import org.javacord.api.interaction.ApplicationCommandOptionBuilder
-import org.javacord.api.interaction.ApplicationCommandOptionType
 import org.javacord.api.interaction.Interaction
 
 class Quote(private val bot: Bot) {

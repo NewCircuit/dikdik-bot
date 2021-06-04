@@ -3,14 +3,9 @@ package io.newcircuit.dikdik.models
 import io.newcircuit.dikdik.Bot
 import org.javacord.api.entity.channel.ChannelType
 import org.javacord.api.entity.channel.ServerTextChannel
-import org.javacord.api.entity.channel.TextChannel
-import org.javacord.api.entity.message.Message
-import org.javacord.api.entity.permission.PermissionType
-import org.javacord.api.entity.user.User
 import org.javacord.api.interaction.ApplicationCommandInteractionData
 import org.javacord.api.interaction.ApplicationCommandOptionBuilder
 import org.javacord.api.interaction.Interaction
-import java.lang.String.format
 
 abstract class Command(
     val bot: Bot,
@@ -54,7 +49,10 @@ abstract class Command(
     protected abstract fun run(interaction: Interaction, data: ApplicationCommandInteractionData): Pair<Boolean, String>
 
     companion object {
-        fun getChannel(interaction: Interaction, data: ApplicationCommandInteractionData): ServerTextChannel? {
+        fun getChannel(
+            interaction: Interaction,
+            data: ApplicationCommandInteractionData,
+        ): ServerTextChannel? {
             if (data.options.size == 0) {
                 return interaction.channel.get().asServerTextChannel().get()
             }

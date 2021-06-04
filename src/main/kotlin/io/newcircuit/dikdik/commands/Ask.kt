@@ -2,7 +2,7 @@ package io.newcircuit.dikdik.commands
 
 import io.newcircuit.dikdik.Bot
 import io.newcircuit.dikdik.models.Command
-import io.newcircuit.dikdik.models.Question
+import io.newcircuit.dikdik.models.Vote
 import org.javacord.api.interaction.ApplicationCommandInteractionData
 import org.javacord.api.interaction.ApplicationCommandOptionBuilder
 import org.javacord.api.interaction.ApplicationCommandOptionType
@@ -21,18 +21,16 @@ class Ask(bot: Bot): Command(
         }?: return Pair(false, "Please provide a question")
 
         val questionStr = option.stringValue.get()
-        val newVote = Question(
-            interaction,
+        val newVote = Vote(
+            interaction.channel.get().id,
             questionStr,
         )
+        val voteAdded = bot.store.votes.addVote(newVote)
 
-        for (vote in bot.votes.values) {
-            if (vote.id == newVote.id) {
-                return Pair(false, "There's already an active vote in this channel.")
-            }
+        if (!voteAdded) {
+            return Pair(false, "There's already an active vote in this channel.")
         }
 
-        bot.votes[newVote.id] = newVote
         val msg = newVote.getIBuilder()
         msg.sendInitialResponse(interaction).join()
 

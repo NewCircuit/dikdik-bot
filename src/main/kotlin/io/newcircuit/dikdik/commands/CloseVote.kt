@@ -13,9 +13,11 @@ class CloseVote(bot: Bot) : Command(
 ) {
     override fun run(interaction: Interaction, data: ApplicationCommandInteractionData): Pair<Boolean, String> {
         val voteId = interaction.channel.get().id
-        val vote = bot.votes[voteId]?: return Pair(false, "There are no active votes in this channel.")
-        vote.close()
-        bot.votes.remove(vote.id)
+        val removed = bot.store.votes.close(interaction, voteId)
+
+        if (!removed) {
+            return Pair(false, "There are no active votes in this channel.")
+        }
 
         InteractionMessageBuilder()
             .setContent("Vote closed.")
