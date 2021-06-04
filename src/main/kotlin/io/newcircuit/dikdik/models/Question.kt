@@ -34,14 +34,8 @@ class Question(
 
     fun close() {
         val iBuilder = getIBuilder(true)
-        val (yes, no) = countVotes()
-        val finalSay = if (yes > no) {
-            "**vote passed!**"
-        } else {
-            "**vote failed!**"
-        }
 
-        iBuilder.setContent("$message ($finalSay)")
+        iBuilder.setContent("$message (closed)")
             .editOriginalResponse(interaction)
             .join()
     }
