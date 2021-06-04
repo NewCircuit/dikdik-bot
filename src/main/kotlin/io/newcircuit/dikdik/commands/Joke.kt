@@ -16,10 +16,6 @@ class Joke(bot: Bot) : Command(
     private val quote = Quote(bot)
 
     override fun run(interaction: Interaction, data: ApplicationCommandInteractionData): Pair<Boolean, String> {
-        return quote.run(interaction, data, "joke")
-    }
-
-    override fun getOptions(): ArrayList<ApplicationCommandOptionBuilder> {
-        return quote.getOptions()
+        return quote.run(interaction, "joke")
     }
 }
