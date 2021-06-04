@@ -22,7 +22,6 @@ class Ask(bot: Bot): Command(
 
         val questionStr = option.stringValue.get()
         val newVote = Vote(
-            interaction,
             interaction.channel.get().id,
             questionStr,
         )

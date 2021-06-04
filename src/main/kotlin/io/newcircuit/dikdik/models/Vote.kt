@@ -1,7 +1,6 @@
 package io.newcircuit.dikdik.models
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import org.javacord.api.entity.message.InteractionMessageBuilder
 import org.javacord.api.entity.message.component.ActionRowBuilder
 import org.javacord.api.entity.message.component.ButtonBuilder
@@ -10,8 +9,6 @@ import org.javacord.api.interaction.Interaction
 
 @Serializable
 class Vote(
-    @Transient
-    val interaction: Interaction? = null,
     val id: Long,
     private val message: String,
     private val entries: ArrayList<SubmittedVote> = ArrayList()
@@ -35,16 +32,19 @@ class Vote(
         update(interaction)
     }
 
-    fun close() {
-        val iBuilder = getIBuilder(true)
+    fun close(interaction: Interaction) {
+        val iBuilder = getIBuilder(true, interaction)
 
         iBuilder.setContent("$message (closed)")
-            .editOriginalResponse(interaction)
+            .update(interaction)
             .join()
     }
 
-    fun getIBuilder(toDisable: Boolean = false): InteractionMessageBuilder {
-        val components = getComponents(toDisable)
+    fun getIBuilder(
+        toDisable: Boolean = false,
+        interaction: Interaction? = null,
+    ): InteractionMessageBuilder {
+        val components = getComponents(toDisable, interaction)
         return InteractionMessageBuilder()
             .setContent(message)
             .addComponent(components)
@@ -71,8 +71,23 @@ class Vote(
         return Pair(yes, no)
     }
 
-    private fun getComponents(toDisable: Boolean = false): ActionRowBuilder {
+    private fun getComponents(
+        toDisable: Boolean = false,
+        interaction: Interaction? = null,
+    ): ActionRowBuilder {
         val (yes, no) = countVotes()
+        val close = ButtonBuilder()
+            .setLabel("Close")
+            .setCustomId("vote_close")
+            .setDisabled(toDisable)
+            .setStyle(ButtonStyle.SECONDARY)
+        if (toDisable && interaction != null) {
+            val user = interaction.user
+            close.setLabel("Closed by ${user.discriminatedName}")
+        } else {
+            close.setLabel("Close")
+        }
+
         return ActionRowBuilder()
             .addComponent(
                 ButtonBuilder()
@@ -88,5 +103,6 @@ class Vote(
                     .setDisabled(toDisable)
                     .setStyle(ButtonStyle.DANGER)
             )
+            .addComponent(close)
     }
 }

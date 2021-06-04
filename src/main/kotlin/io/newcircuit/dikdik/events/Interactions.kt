@@ -55,10 +55,14 @@ class Interactions(private val bot: Bot) : InteractionCreateListener {
         data: InteractionComponentData,
     ) {
         val interaction = event.interaction
-        val isYes = data.customId == "vote_yes"
         val voteId = interaction.channel.get().id
-        val vote = bot.store.votes.get(voteId)?: return
+        if (data.customId == "vote_close") {
+            bot.store.votes.close(interaction, voteId)
+            return
+        }
 
+        val vote = bot.store.votes.get(voteId)?: return
+        val isYes = data.customId == "vote_yes"
         vote.addEntry(
             event.interaction,
             interaction.user.id,

@@ -40,7 +40,6 @@ class Bot(val config: Config) {
             Stop(this),
             Button(this),
             Ask(this),
-            CloseVote(this),
         )
 
         for (command in cmds) {
