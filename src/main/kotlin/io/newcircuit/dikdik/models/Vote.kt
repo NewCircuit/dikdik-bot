@@ -1,6 +1,7 @@
 package io.newcircuit.dikdik.models
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import org.javacord.api.entity.message.InteractionMessageBuilder
 import org.javacord.api.entity.message.component.ActionRowBuilder
 import org.javacord.api.entity.message.component.ButtonBuilder
@@ -9,6 +10,8 @@ import org.javacord.api.interaction.Interaction
 
 @Serializable
 class Vote(
+    @Transient
+    val interaction: Interaction? = null,
     val id: Long,
     private val message: String,
     private val entries: ArrayList<SubmittedVote> = ArrayList()
@@ -32,7 +35,7 @@ class Vote(
         update(interaction)
     }
 
-    fun close(interaction: Interaction) {
+    fun close() {
         val iBuilder = getIBuilder(true)
 
         iBuilder.setContent("$message (closed)")

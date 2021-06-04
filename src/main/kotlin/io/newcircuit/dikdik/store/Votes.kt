@@ -23,9 +23,9 @@ class Votes(
 
     fun get(channelId: Long): Vote? = votes[channelId]
 
-    fun close(interaction: Interaction, channelId: Long): Boolean {
+    fun close(channelId: Long): Boolean {
         val vote = votes[channelId] ?: return false
-        vote.close(interaction)
+        vote.close()
         votes.remove(channelId)
         return true
     }
